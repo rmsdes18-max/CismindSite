@@ -22,7 +22,7 @@ export function VersionsBlock({ versions, onAddVersion }: Props) {
   return (
     <div className="col-span-full pt-1.5 border-t border-dashed border-rule mt-1.5">
       <div className="flex items-baseline justify-between mb-3">
-        <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-ink">
+        <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-ink">
           Versiuni de progres
         </span>
         <span className="font-mono text-[10px] text-ink-faded tracking-[0.05em]">
@@ -48,7 +48,7 @@ export function VersionsBlock({ versions, onAddVersion }: Props) {
                 <span
                   className={`absolute -left-1 top-3.5 w-[7px] h-[7px] rounded-full ${
                     isLatest
-                      ? 'bg-accent shadow-[0_0_0_3px_rgba(193,74,40,0.12)]'
+                      ? 'bg-accent shadow-[0_0_0_3px_rgba(231,0,80,0.15)]'
                       : 'bg-ink-faded'
                   }`}
                 />

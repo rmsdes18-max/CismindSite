@@ -4,7 +4,7 @@ import { nextStatus, statusLabel } from '@/lib/dates'
 const dotStyles: Record<OrderStatus, string> = {
   oferta:    'bg-transparent border-[1.5px] border-amber',
   nou:       'bg-amber',
-  'in-lucru': 'bg-accent shadow-[0_0_0_3px_rgba(193,74,40,0.12)]',
+  'in-lucru': 'bg-accent shadow-[0_0_0_3px_rgba(231,0,80,0.15)]',
   finalizat: 'bg-green opacity-60',
 }
 

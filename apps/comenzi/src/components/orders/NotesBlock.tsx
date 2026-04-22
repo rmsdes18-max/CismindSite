@@ -20,7 +20,7 @@ export function NotesBlock({ notes, onAddNote }: Props) {
   return (
     <div className="col-span-full pt-1.5 border-t border-dashed border-rule mt-1.5">
       <div className="flex items-baseline justify-between mb-3">
-        <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-ink">Note</span>
+        <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-ink">Note</span>
         <span className="font-mono text-[10px] text-ink-faded tracking-[0.05em]">
           {notes.length}
         </span>
@@ -44,7 +44,7 @@ export function NotesBlock({ notes, onAddNote }: Props) {
                   {fmtRelative(n.at)}
                 </span>
               </div>
-              <div className="font-display text-[15px] leading-[1.45] text-ink-soft">{n.text}</div>
+              <div className="font-display text-[13px] leading-[1.45] text-ink-soft">{n.text}</div>
             </li>
           ))}
         </ul>

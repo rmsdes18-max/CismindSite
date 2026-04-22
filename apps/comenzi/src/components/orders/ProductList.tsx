@@ -16,8 +16,8 @@ export function ProductList({ items }: Props) {
             {String(i + 1).padStart(2, '0')}
           </span>
           <div className="min-w-0">
-            <div className="font-display text-[15px] leading-[1.3] text-ink">{it.what}</div>
-            <div className="font-mono text-[11px] text-ink-faded mt-0.5 tracking-[0.02em]">
+            <div className="font-display text-sm leading-[1.3] text-ink">{it.what}</div>
+            <div className="font-mono text-xs text-ink-faded mt-0.5 tracking-[0.02em]">
               {it.dim} · {it.material}
             </div>
           </div>

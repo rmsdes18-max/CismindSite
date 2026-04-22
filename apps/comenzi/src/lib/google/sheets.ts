@@ -79,18 +79,26 @@ export class SheetsService {
     return rowToOrder(row)
   }
 
-  async getLastId(): Promise<number> {
+  async getNextId(): Promise<string> {
     const range = encodeURIComponent(`${this.tabName}!A:A`)
     const res = await this.fetch(`${API}/${this.sheetsId}/values/${range}`)
     const data = await res.json()
     const values = (data.values ?? []) as string[][]
-    for (let i = values.length - 1; i >= 1; i--) {
+
+    // Find max numeric ID across all rows
+    let max = 0
+    for (let i = 1; i < values.length; i++) {
       const val = values[i]?.[0]
-      if (val) {
-        const parsed = parseInt(val, 10)
-        if (!isNaN(parsed)) return parsed
+      if (!val) continue
+      const parsed = parseInt(val, 10)
+      if (!isNaN(parsed)) {
+        // Old format (2604, 2605...) → ignore for new sequence, start fresh at 0001
+        if (parsed > 9999) continue
+        if (parsed > max) max = parsed
       }
     }
-    return 2610
+
+    const nextNum = max === 0 ? 1 : max + 1
+    return String(nextNum).padStart(4, '0')
   }
 }

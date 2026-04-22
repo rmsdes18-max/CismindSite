@@ -27,9 +27,8 @@ export function useCreateOrder({ getToken, onSuccess }: CreateOrderDeps) {
       const sheets = new SheetsService(env.sheetsId, env.sheetsTab, getToken)
       const drive = new DriveService(env.driveRootFolderId, getToken)
 
-      // 1. Get next ID
-      const lastId = await sheets.getLastId()
-      const id = String(lastId + 1)
+      // 1. Get next ID (0001 format)
+      const id = await sheets.getNextId()
 
       // 2. Build deadline
       const dlOffset: Record<string, number> = { today: 0, tomorrow: 1, d3: 3, d7: 7 }

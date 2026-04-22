@@ -155,7 +155,7 @@ function AppShell() {
       dl.setDate(dl.getDate() + (dlOffset[payload.deadline] ?? 1))
       dl.setHours(17, 0, 0, 0)
 
-      const newId = String(2611 + orders.length - 7)
+      const newId = String(orders.length + 1).padStart(4, '0')
       const items: OrderItem[] =
         payload.products.length > 0
           ? payload.products.map((p) => ({

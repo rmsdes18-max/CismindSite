@@ -76,7 +76,7 @@ export function OrderCard({
           </span>
           {order.name}
         </h3>
-        <div className="font-mono text-xs text-ink-soft flex flex-wrap gap-x-3.5 gap-y-0.5 leading-6">
+        <div className="font-mono text-[13px] text-ink-soft flex flex-wrap gap-x-3.5 gap-y-0.5 leading-6">
           <span className="text-ink">{order.client}</span>
           <span className="text-rule">·</span>
           <span>{itemSummary}</span>
@@ -90,14 +90,14 @@ export function OrderCard({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Meta fields */}
-            <div className="font-mono text-xs leading-relaxed">
+            <div className="font-mono text-sm leading-relaxed">
               <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
                 Client · {CHANNELS[order.channel]}
               </span>
               <span className="text-ink">{order.client}</span>
               <div className="font-mono text-[11px] text-ink-faded mt-0.5">{order.contact}</div>
             </div>
-            <div className="font-mono text-xs leading-relaxed">
+            <div className="font-mono text-sm leading-relaxed">
               <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
                 Deadline
               </span>
@@ -109,7 +109,7 @@ export function OrderCard({
             {/* Products */}
             <div className="col-span-full pt-1.5 border-t border-dashed border-rule mt-1.5">
               <div className="flex items-baseline justify-between mb-3">
-                <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-ink">
+                <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-ink">
                   Produse
                 </span>
                 <span className="font-mono text-[10px] text-ink-faded tracking-[0.05em]">
