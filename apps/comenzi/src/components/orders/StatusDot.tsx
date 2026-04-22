@@ -1,11 +1,13 @@
+import { FileText, Inbox, Loader, Check } from 'lucide-react'
 import type { OrderStatus } from '@/types/order'
 import { nextStatus, statusLabel } from '@/lib/dates'
+import type { LucideIcon } from 'lucide-react'
 
-const dotStyles: Record<OrderStatus, string> = {
-  oferta:     'bg-status-oferta',
-  nou:        'bg-transparent border-[1.5px] border-status-nou',
-  'in-lucru': 'bg-status-lucru shadow-[0_0_0_3px_rgba(59,122,158,0.15)]',
-  finalizat:  'bg-status-finalizat',
+const STATUS_CONFIG: Record<OrderStatus, { icon: LucideIcon; color: string }> = {
+  oferta:     { icon: FileText, color: 'var(--status-oferta)' },
+  nou:        { icon: Inbox,    color: 'var(--status-nou)' },
+  'in-lucru': { icon: Loader,   color: 'var(--status-lucru)' },
+  finalizat:  { icon: Check,    color: 'var(--status-finalizat)' },
 }
 
 interface Props {
@@ -14,14 +16,19 @@ interface Props {
 }
 
 export function StatusDot({ status, onAdvance }: Props) {
+  const config = STATUS_CONFIG[status]
+  const Icon = config.icon
+
   return (
     <button
-      className={`w-2.5 h-2.5 rounded-full mt-2.5 shrink-0 justify-self-start transition-transform hover:scale-130 ${dotStyles[status]}`}
+      className="shrink-0 mt-1.5 transition-transform hover:scale-125 order-2 sm:order-none justify-self-end sm:justify-self-start"
       onClick={(e) => {
         e.stopPropagation()
         onAdvance()
       }}
       title={`Status: ${statusLabel(status)} (click: avansează la ${statusLabel(nextStatus(status))})`}
-    />
+    >
+      <Icon size={16} strokeWidth={2} style={{ color: config.color }} />
+    </button>
   )
 }
