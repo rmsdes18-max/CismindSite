@@ -68,57 +68,83 @@ function InlineItemEdit({
 
 export function ProductList({ items, onEditItem, onDeleteItem }: Props) {
   const [editingIdx, setEditingIdx] = useState<number | null>(null)
+  const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set())
+
+  const toggleCheck = (index: number) => {
+    setCheckedItems((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
 
   return (
     <ul className="list-none m-0 mb-2.5 p-0">
-      {items.map((it, i) => (
-        <li
-          key={i}
-          className="py-2.5 border-b border-accent-soft last:border-b-0"
-        >
-          {editingIdx === i ? (
-            <InlineItemEdit
-              item={it}
-              onSave={(newItem) => {
-                onEditItem?.(i, newItem)
-                setEditingIdx(null)
-              }}
-              onCancel={() => setEditingIdx(null)}
-            />
-          ) : (
-            <div className="grid grid-cols-[28px_1fr_auto] gap-2.5 items-baseline">
-              <span className="font-mono text-[10px] text-ink-faded tracking-[0.05em]">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <div
-                className={`min-w-0 ${onEditItem ? 'cursor-pointer hover:text-accent' : ''}`}
-                onClick={(e) => {
-                  if (!onEditItem) return
-                  e.stopPropagation()
-                  setEditingIdx(i)
+      {items.map((it, i) => {
+        const isChecked = checkedItems.has(i)
+        return (
+          <li key={i} className="py-2.5 border-b border-accent-soft last:border-b-0">
+            {editingIdx === i ? (
+              <InlineItemEdit
+                item={it}
+                onSave={(newItem) => {
+                  onEditItem?.(i, newItem)
+                  setEditingIdx(null)
                 }}
-              >
-                <div className="font-display text-sm leading-[1.3] text-ink">{it.what}</div>
-                <div className="font-mono text-xs text-ink-faded mt-0.5 tracking-[0.02em]">
-                  {it.dim} · {it.material}
+                onCancel={() => setEditingIdx(null)}
+              />
+            ) : (
+              <div className="grid grid-cols-[20px_1fr_auto] gap-2.5 items-baseline">
+                {/* Checkbox */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleCheck(i) }}
+                  className={`w-4 h-4 rounded-sm border mt-0.5 flex items-center justify-center transition-colors ${
+                    isChecked
+                      ? 'bg-status-finalizat border-status-finalizat text-paper'
+                      : 'border-rule hover:border-ink-faded'
+                  }`}
+                >
+                  {isChecked && <span className="text-[10px] leading-none">✓</span>}
+                </button>
+
+                <div
+                  className={`min-w-0 ${onEditItem ? 'cursor-pointer hover:text-accent' : ''} ${isChecked ? 'opacity-40 line-through' : ''}`}
+                  onClick={(e) => {
+                    if (!onEditItem) return
+                    e.stopPropagation()
+                    setEditingIdx(i)
+                  }}
+                >
+                  <div className="font-display text-sm leading-[1.3] text-ink">
+                    {it.what} <span className="font-mono text-xs text-ink-faded">· {it.qty} buc</span>
+                    {it.material && it.material !== '—' && (
+                      <span className="font-mono text-xs text-ink-faded"> · {it.material}</span>
+                    )}
+                  </div>
+                  {it.dim && it.dim !== '—' && (
+                    <div className="font-mono text-xs text-ink-faded mt-0.5 tracking-[0.02em]">
+                      {it.dim}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-baseline gap-2">
+                  {onDeleteItem && items.length > 1 && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDeleteItem(i) }}
+                      className="text-ink-faded hover:text-accent transition-colors"
+                      title="Șterge produs"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="flex items-baseline gap-2">
-                <span className="font-mono text-[13px] text-ink whitespace-nowrap">× {it.qty}</span>
-                {onDeleteItem && items.length > 1 && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onDeleteItem(i) }}
-                    className="text-ink-faded hover:text-accent transition-colors"
-                    title="Șterge produs"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </li>
-      ))}
+            )}
+          </li>
+        )
+      })}
     </ul>
   )
 }

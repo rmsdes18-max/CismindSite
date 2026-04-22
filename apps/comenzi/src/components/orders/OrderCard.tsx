@@ -1,15 +1,14 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Order, OrderItem, OrderStatus, OrderChannel } from '@/types/order'
 import { CHANNELS } from '@/lib/constants'
 import { dayDiff, fmtDateShort } from '@/lib/dates'
 import { formatPhone } from '@/lib/format'
+import { User, Calendar } from 'lucide-react'
 import { StatusDot } from './StatusDot'
 import { StatusPills } from './StatusPills'
 import { ProductList } from './ProductList'
 import { AddProductForm } from './AddProductForm'
 import { EditableField } from './EditableField'
-// TODO: reactivare versiuni când business-ul cere iterații vizuale
-// import { VersionsBlock } from './VersionsBlock'
 import { NotesBlock } from './NotesBlock'
 import { DriveFolders } from './DriveFolders'
 
@@ -29,6 +28,80 @@ interface Props {
   showDeadline?: boolean
 }
 
+function ClientPopover({
+  order,
+  onUpdateField,
+  onClose,
+}: {
+  order: Order
+  onUpdateField?: (id: string, fields: Partial<Pick<Order, 'client' | 'contact' | 'channel'>>) => void
+  onClose: () => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [onClose])
+
+  return (
+    <div
+      ref={ref}
+      className="absolute right-0 top-full mt-1 bg-paper border border-rule rounded-sm shadow-[0_8px_24px_rgba(0,0,0,0.12)] p-3 min-w-[220px] z-40"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-faded mb-2">
+        Client
+      </div>
+      <div className="space-y-2">
+        <div>
+          <span className="font-mono text-[9px] text-ink-faded uppercase tracking-[0.1em]">Nume</span>
+          {onUpdateField ? (
+            <EditableField
+              value={order.client}
+              onSave={(v) => onUpdateField(order.id, { client: v })}
+              className="block font-mono text-sm text-ink"
+            />
+          ) : (
+            <div className="font-mono text-sm text-ink">{order.client}</div>
+          )}
+        </div>
+        <div>
+          <span className="font-mono text-[9px] text-ink-faded uppercase tracking-[0.1em]">Telefon</span>
+          {onUpdateField ? (
+            <EditableField
+              value={order.contact}
+              onSave={(v) => onUpdateField(order.id, { contact: v })}
+              className="block font-mono text-sm text-ink"
+            />
+          ) : (
+            <div className="font-mono text-sm text-ink">{formatPhone(order.contact)}</div>
+          )}
+        </div>
+        <div>
+          <span className="font-mono text-[9px] text-ink-faded uppercase tracking-[0.1em]">Canal</span>
+          {onUpdateField ? (
+            <select
+              value={order.channel}
+              onChange={(e) => onUpdateField(order.id, { channel: e.target.value as OrderChannel })}
+              className="block font-mono text-sm text-ink bg-transparent border-b border-rule focus:border-accent outline-none cursor-pointer w-full mt-0.5"
+            >
+              {Object.entries(CHANNELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          ) : (
+            <div className="font-mono text-sm text-ink">{CHANNELS[order.channel]}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function OrderCard({
   order,
   isOpen,
@@ -45,17 +118,19 @@ export function OrderCard({
   showDeadline = true,
 }: Props) {
   const [addingItem, setAddingItem] = useState(false)
+  const [clientOpen, setClientOpen] = useState(false)
 
   const now = new Date()
   const diff = dayDiff(new Date(order.deadline), now)
   const isUrgent = diff <= 0 && order.status !== 'finalizat'
   const isDone = order.status === 'finalizat'
 
-  const totalQty = order.items.reduce((s, it) => s + it.qty, 0)
-  const itemSummary =
-    order.items.length === 1
-      ? order.items[0]!.qty + ' × ' + order.items[0]!.what.toLowerCase()
-      : order.items.length + ' produse · ' + totalQty + ' buc total'
+  // Collapsed summary: "Stikere Cerc · 200 buc · Adeziv" format
+  const itemsSummary = order.items.map((it) => {
+    const parts = [it.what, it.qty + ' buc']
+    if (it.material && it.material !== '—') parts.push(it.material)
+    return parts.join(' · ')
+  }).join(' | ')
 
   return (
     <div
@@ -67,106 +142,85 @@ export function OrderCard({
       onClick={() => onToggle(order.id)}
     >
       <div className="min-w-0 order-1 sm:order-2">
-        <h3
-          className={`font-display text-[19px] font-normal tracking-[-0.01em] leading-[1.3] m-0 mb-1 ${
-            isDone ? 'line-through decoration-ink-faded text-ink-faded' : ''
-          }`}
-        >
-          <span className="font-mono text-[11px] text-ink-faded mr-2 tracking-normal font-normal align-[2px]">
-            #{order.id}
-          </span>
-          {isOpen && onUpdateField ? (
-            <EditableField
-              value={order.name}
-              onSave={(v) => onUpdateField(order.id, { name: v })}
-              className="font-display text-[19px]"
-            />
-          ) : (
-            order.name
-          )}
-        </h3>
-        <div className="font-mono text-[13px] text-ink-soft leading-6">
-          <div className="flex flex-wrap gap-x-3.5 gap-y-0.5">
-            <span className="text-ink">{order.client}</span>
-            <span className="text-rule">·</span>
-            <span>{formatPhone(order.contact)}</span>
-          </div>
-          <div className="flex flex-wrap gap-x-3.5 gap-y-0.5">
-            <span>{itemSummary}</span>
-            <span className="text-rule">·</span>
-            <span className="text-ink-faded">{CHANNELS[order.channel]}</span>
-          </div>
-        </div>
-
-        {isOpen && (
-          <div
-            className="col-span-full pt-2.5 mt-2.5 border-t border-dashed border-rule grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8"
-            onClick={(e) => e.stopPropagation()}
+        {/* Title row + right-side actions */}
+        <div className="flex items-start justify-between gap-2">
+          <h3
+            className={`font-display text-[19px] font-normal tracking-[-0.01em] leading-[1.3] m-0 mb-1 ${
+              isDone ? 'line-through decoration-ink-faded text-ink-faded' : ''
+            }`}
           >
-            {/* Meta fields — side by side on all screens */}
-            <div className="col-span-full flex gap-6 justify-between">
-              <div className="font-mono text-sm leading-relaxed">
-                <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
-                  Client ·{' '}
-                  {onUpdateField ? (
-                    <select
-                      value={order.channel}
-                      onChange={(e) => onUpdateField(order.id, { channel: e.target.value as OrderChannel })}
-                      onClick={(e) => e.stopPropagation()}
-                      className="bg-transparent text-ink-faded text-[10px] tracking-[0.1em] uppercase cursor-pointer border-none outline-none"
-                    >
-                      {Object.entries(CHANNELS).map(([k, v]) => (
-                        <option key={k} value={k}>{v}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    CHANNELS[order.channel]
-                  )}
-                </span>
-                {onUpdateField ? (
-                  <EditableField
-                    value={order.client}
-                    onSave={(v) => onUpdateField(order.id, { client: v })}
-                    className="text-ink"
+            <span className="font-mono text-[11px] text-ink-faded mr-2 tracking-normal font-normal align-[2px]">
+              #{order.id}
+            </span>
+            {isOpen && onUpdateField ? (
+              <EditableField
+                value={order.name}
+                onSave={(v) => onUpdateField(order.id, { name: v })}
+                className="font-display text-[19px]"
+              />
+            ) : (
+              order.name
+            )}
+          </h3>
+
+          {/* Right side: client icon + deadline */}
+          {isOpen && (
+            <div className="flex items-center gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
+              {/* Client popover trigger */}
+              <div className="relative">
+                <button
+                  onClick={() => setClientOpen(!clientOpen)}
+                  className="flex items-center gap-1.5 font-mono text-[10px] text-ink-faded hover:text-ink transition-colors"
+                  title={`${order.client} · ${formatPhone(order.contact)}`}
+                >
+                  <User size={14} />
+                  <span className="hidden sm:inline">{order.client.split(' ')[0]}</span>
+                </button>
+                {clientOpen && (
+                  <ClientPopover
+                    order={order}
+                    onUpdateField={onUpdateField}
+                    onClose={() => setClientOpen(false)}
                   />
-                ) : (
-                  <span className="text-ink">{order.client}</span>
                 )}
-                <div className="font-mono text-[11px] text-ink-faded mt-0.5">
-                  {onUpdateField ? (
-                    <EditableField
-                      value={order.contact}
-                      onSave={(v) => onUpdateField(order.id, { contact: v })}
-                      className="text-ink-faded"
-                      placeholder="contact"
-                    />
-                  ) : (
-                    formatPhone(order.contact)
-                  )}
-                </div>
               </div>
-              <div className="font-mono text-sm leading-relaxed text-right">
-                <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
-                  Deadline
-                </span>
+
+              {/* Deadline inline */}
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} className={isUrgent ? 'text-accent' : 'text-ink-faded'} />
                 {onUpdateField ? (
                   <EditableField
                     value={order.deadline.split('T')[0]!}
                     onSave={(v) => onUpdateField(order.id, { deadline: new Date(v + 'T17:00:00').toISOString() })}
-                    className="text-ink font-semibold"
+                    className={`font-mono text-[11px] ${isUrgent ? 'text-accent font-semibold' : 'text-ink-faded'}`}
                     type="date"
                     min={new Date().toISOString().split('T')[0]}
                   />
                 ) : (
-                  <span className="text-ink font-semibold">
+                  <span className={`font-mono text-[11px] ${isUrgent ? 'text-accent font-semibold' : 'text-ink-faded'}`}>
                     {fmtDateShort(order.deadline)}
                   </span>
                 )}
               </div>
             </div>
+          )}
+        </div>
 
+        {/* Collapsed: product summary */}
+        {!isOpen && (
+          <div className="font-mono text-[13px] text-ink-soft leading-6 truncate">
+            {itemsSummary}
+          </div>
+        )}
+
+        {/* Expanded content */}
+        {isOpen && (
+          <div
+            className="pt-2.5 mt-2.5 border-t border-dashed border-rule"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Products */}
-            <div className="col-span-full pt-1.5 border-t border-dashed border-rule mt-1.5">
+            <div>
               <div className="flex items-baseline justify-between mb-3">
                 <span className="font-mono text-[11px] tracking-[0.12em] uppercase text-ink">
                   Produse
@@ -198,8 +252,6 @@ export function OrderCard({
                 />
               )}
             </div>
-
-            {/* TODO: reactivare versiuni când business-ul cere iterații vizuale */}
 
             <NotesBlock
               notes={order.notes}
