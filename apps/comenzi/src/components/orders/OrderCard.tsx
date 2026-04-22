@@ -52,12 +52,21 @@ export function OrderCard({
     <div
       className={`grid items-start gap-3.5 py-4 border-b border-rule-soft cursor-pointer transition-colors hover:bg-accent/[0.025] last:border-b-0 ${
         isOpen
-          ? 'grid-cols-[1fr_14px] sm:grid-cols-[14px_1fr] bg-paper-deep -mx-4 px-4 border-b-rule'
-          : 'grid-cols-[1fr_14px] sm:grid-cols-[14px_1fr_auto]'
+          ? 'grid-cols-[14px_1fr] bg-paper-deep -mx-4 px-4 border-b-rule'
+          : 'grid-cols-[14px_1fr_auto]'
       }`}
       onClick={() => onToggle(order.id)}
     >
-      <div className="min-w-0 order-1 sm:order-2">
+      <StatusDot
+        status={order.status}
+        onAdvance={() => onChangeStatus(order.id, (
+          order.status === 'oferta' ? 'nou' :
+          order.status === 'nou' ? 'in-lucru' :
+          order.status === 'in-lucru' ? 'finalizat' : 'oferta'
+        ) as OrderStatus)}
+      />
+
+      <div className="min-w-0">
         <h3
           className={`font-display text-[19px] font-normal tracking-[-0.01em] leading-[1.3] m-0 mb-1 ${
             isDone ? 'line-through decoration-ink-faded text-ink-faded' : ''
@@ -163,17 +172,8 @@ export function OrderCard({
         )}
       </div>
 
-      <StatusDot
-        status={order.status}
-        onAdvance={() => onChangeStatus(order.id, (
-          order.status === 'oferta' ? 'nou' :
-          order.status === 'nou' ? 'in-lucru' :
-          order.status === 'in-lucru' ? 'finalizat' : 'oferta'
-        ) as OrderStatus)}
-      />
-
       {!isOpen && showDeadline && (
-        <div className="text-right font-mono whitespace-nowrap pt-0.5 hidden sm:block order-3">
+        <div className="text-right font-mono whitespace-nowrap pt-0.5 hidden sm:block">
           <span className={`block text-sm tracking-[-0.01em] ${isUrgent ? 'text-accent font-semibold' : 'text-ink'}`}>
             {fmtDateShort(order.deadline)}
           </span>
