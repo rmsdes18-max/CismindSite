@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   CHANNEL_OPTIONS,
-  DEADLINE_OPTIONS,
   MORE_PRODUCT_OPTIONS,
 } from './chat-steps'
 
@@ -41,13 +40,22 @@ interface ProductField {
   key: string
   q: React.ReactNode
   placeholder: string
+  skippable: boolean
+  skipDefault: string
 }
 
 const PRODUCT_FIELDS: ProductField[] = [
-  { key: 'what', q: <>Ce <em className="italic text-accent">printăm</em>? Descrie produsul.</>, placeholder: 'ex: Stickere rotunde vinyl' },
-  { key: 'dim', q: <>Ce dimensiuni?</>, placeholder: 'ex: 80 × 80 mm' },
-  { key: 'material', q: <>Pe ce material?</>, placeholder: 'ex: vinyl mat' },
-  { key: 'qty', q: <>Câte bucăți?</>, placeholder: 'cantitate' },
+  { key: 'what', q: <>Ce <em className="italic text-accent">printăm</em>? Descrie produsul.</>, placeholder: 'ex: Stickere rotunde vinyl', skippable: false, skipDefault: '' },
+  { key: 'dim', q: <>Ce dimensiuni?</>, placeholder: 'ex: 80 × 80 mm', skippable: true, skipDefault: '—' },
+  { key: 'material', q: <>Pe ce material?</>, placeholder: 'ex: vinyl mat', skippable: true, skipDefault: '—' },
+  { key: 'qty', q: <>Câte bucăți?</>, placeholder: 'cantitate (default 1)', skippable: false, skipDefault: '1' },
+]
+
+const DEADLINE_OPTIONS = [
+  { v: 'today', l: 'azi' },
+  { v: 'tomorrow', l: 'mâine' },
+  { v: 'd3', l: 'în 3 zile' },
+  { v: 'd7', l: 'săptămâna viitoare' },
 ]
 
 export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
@@ -59,7 +67,9 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [input, setInput] = useState('')
   const [isDone, setIsDone] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dateRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -82,13 +92,24 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
     })
   }
 
+  const advanceProduct = (updated: Record<string, string>) => {
+    if (productIdx + 1 < PRODUCT_FIELDS.length) {
+      setProductIdx(productIdx + 1)
+    } else {
+      setProducts([...products, updated])
+      setCurrentProduct({})
+      setProductIdx(0)
+      setPhase('product-more')
+    }
+  }
+
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim()) return
     const val = input.trim()
     setInput('')
 
     if (phase === 'base') {
+      if (!val) return
       const step = BASE_STEPS[baseIdx]!
       const updated = { ...answers, [step.key]: val }
       setAnswers(updated)
@@ -100,17 +121,23 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
       }
     } else if (phase === 'product') {
       const field = PRODUCT_FIELDS[productIdx]!
-      const updated = { ...currentProduct, [field.key]: val }
+      // Skip-able fields accept empty input
+      if (!val && !field.skippable && field.key !== 'qty') return
+      const value = val || field.skipDefault
+      const updated = { ...currentProduct, [field.key]: value }
       setCurrentProduct(updated)
-      if (productIdx + 1 < PRODUCT_FIELDS.length) {
-        setProductIdx(productIdx + 1)
-      } else {
-        setProducts([...products, updated])
-        setCurrentProduct({})
-        setProductIdx(0)
-        setPhase('product-more')
-      }
+      advanceProduct(updated)
     }
+  }
+
+  const handleSkip = () => {
+    if (phase !== 'product') return
+    const field = PRODUCT_FIELDS[productIdx]!
+    const value = field.skipDefault
+    const updated = { ...currentProduct, [field.key]: value }
+    setCurrentProduct(updated)
+    setInput('')
+    advanceProduct(updated)
   }
 
   const handleChoice = (key: string, val: string) => {
@@ -137,14 +164,25 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
     }
   }
 
+  const handleCustomDate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateStr = e.target.value
+    if (!dateStr) return
+    // Store as ISO with 17:00
+    const d = new Date(dateStr + 'T17:00:00')
+    const finalAnswers = { ...answers, deadline: d.toISOString() }
+    setAnswers(finalAnswers)
+    setShowDatePicker(false)
+    finish(finalAnswers, products)
+  }
+
   // Determine current question
-  let current: { key: string; q: React.ReactNode; type: 'text' | 'choice'; placeholder?: string; options?: { v: string; l: string }[] } | null = null
+  let current: { key: string; q: React.ReactNode; type: 'text' | 'choice'; placeholder?: string; options?: { v: string; l: string }[]; skippable?: boolean } | null = null
 
   if (phase === 'base') {
     current = BASE_STEPS[baseIdx]!
   } else if (phase === 'product') {
     const pf = PRODUCT_FIELDS[productIdx]!
-    current = { key: pf.key, q: pf.q, type: 'text', placeholder: pf.placeholder }
+    current = { key: pf.key, q: pf.q, type: 'text', placeholder: pf.placeholder, skippable: pf.skippable }
   } else if (phase === 'product-more') {
     current = {
       key: 'more',
@@ -172,6 +210,8 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
           : phase === 'final'
             ? BASE_STEPS.length + 1
             : totalSteps
+
+  const todayStr = new Date().toISOString().split('T')[0]
 
   return (
     <div
@@ -291,6 +331,15 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
                   enter ↵
                 </button>
               </div>
+              {current.skippable && (
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-faded hover:text-accent mt-2 transition-colors"
+                >
+                  sari peste →
+                </button>
+              )}
             </form>
           )}
 
@@ -310,6 +359,29 @@ export function NewOrderChat({ onDone, onCancel, isCreating }: Props) {
                   {opt.l}
                 </button>
               ))}
+              {/* Custom date button for deadline phase */}
+              {phase === 'final' && !showDatePicker && (
+                <button
+                  className="font-mono text-[11px] tracking-[0.06em] uppercase px-3 py-2 border border-rule rounded-sm hover:border-ink hover:bg-paper-deep transition-all"
+                  onClick={() => {
+                    setShowDatePicker(true)
+                    setTimeout(() => dateRef.current?.showPicker?.(), 100)
+                  }}
+                >
+                  altă dată
+                </button>
+              )}
+              {phase === 'final' && showDatePicker && (
+                <input
+                  ref={dateRef}
+                  type="date"
+                  min={todayStr}
+                  className="font-mono text-[11px] px-3 py-2 border border-accent rounded-sm bg-paper text-ink"
+                  onChange={handleCustomDate}
+                  onKeyDown={(e) => { if (e.key === 'Escape') setShowDatePicker(false) }}
+                  autoFocus
+                />
+              )}
             </div>
           )}
 

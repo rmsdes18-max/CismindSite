@@ -30,11 +30,17 @@ export function useCreateOrder({ getToken, onSuccess }: CreateOrderDeps) {
       // 1. Get next ID (0001 format)
       const id = await sheets.getNextId()
 
-      // 2. Build deadline
+      // 2. Build deadline (accept preset keys or ISO string from custom date)
+      let dl: Date
       const dlOffset: Record<string, number> = { today: 0, tomorrow: 1, d3: 3, d7: 7 }
-      const dl = new Date()
-      dl.setDate(dl.getDate() + (dlOffset[payload.deadline] ?? 1))
-      dl.setHours(17, 0, 0, 0)
+      if (dlOffset[payload.deadline] !== undefined) {
+        dl = new Date()
+        dl.setDate(dl.getDate() + dlOffset[payload.deadline]!)
+        dl.setHours(17, 0, 0, 0)
+      } else {
+        // Custom ISO date from date picker
+        dl = new Date(payload.deadline)
+      }
 
       // 3. Build items
       const items: OrderItem[] =

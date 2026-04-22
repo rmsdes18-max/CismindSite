@@ -151,9 +151,14 @@ function AppShell() {
       createOrder.mutate(payload)
     } else {
       const dlOffset: Record<string, number> = { today: 0, tomorrow: 1, d3: 3, d7: 7 }
-      const dl = new Date()
-      dl.setDate(dl.getDate() + (dlOffset[payload.deadline] ?? 1))
-      dl.setHours(17, 0, 0, 0)
+      let dl: Date
+      if (dlOffset[payload.deadline] !== undefined) {
+        dl = new Date()
+        dl.setDate(dl.getDate() + dlOffset[payload.deadline]!)
+        dl.setHours(17, 0, 0, 0)
+      } else {
+        dl = new Date(payload.deadline)
+      }
 
       const newId = String(orders.length + 1).padStart(4, '0')
       const items: OrderItem[] =
