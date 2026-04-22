@@ -17,7 +17,7 @@ interface Props {
 
 export function StatusPills({ current, onChange }: Props) {
   return (
-    <div className="col-span-full flex gap-1 items-center pt-1.5 border-t border-dashed border-rule">
+    <div className="col-span-full flex flex-wrap gap-1 items-center pt-1.5 border-t border-dashed border-rule">
       {STATUSES.map((s) => {
         const isActive = s.id === current
         const config = STATUS_CONFIG[s.id]

@@ -93,7 +93,7 @@ export function OrderCard({
 
         {isOpen && (
           <div
-            className="col-span-full pt-2.5 mt-2.5 border-t border-dashed border-rule grid grid-cols-2 gap-y-3 gap-x-8"
+            className="col-span-full pt-2.5 mt-2.5 border-t border-dashed border-rule grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Meta fields */}

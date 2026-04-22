@@ -227,7 +227,7 @@ function AppShell() {
 
   return (
     <AuthGuard auth={auth}>
-      <div className="mx-auto max-w-[780px] px-7 pt-8 pb-30">
+      <div className="mx-auto max-w-[780px] px-4 sm:px-7 pt-8 pb-30">
         {/* Top bar */}
         <div className="flex items-center justify-between gap-6 border-b border-rule-soft pb-7 mb-7">
           <div className="font-display text-[22px] font-normal tracking-[-0.01em]">
@@ -247,7 +247,7 @@ function AppShell() {
         </div>
 
         {/* Greeting */}
-        <h1 className="font-display text-[26px] leading-[1.25] font-normal tracking-[-0.015em] max-w-[34ch] mb-1">
+        <h1 className="font-display text-[22px] sm:text-[26px] leading-[1.25] font-normal tracking-[-0.015em] max-w-[34ch] mb-1">
           {salut}. Azi sunt{' '}
           <span className="italic text-accent font-medium">{stats.today}</span>{' '}
           {stats.today === 1 ? 'comandă' : 'comenzi'}, mâine{' '}
@@ -262,13 +262,13 @@ function AppShell() {
         </div>
 
         {/* View tabs */}
-        <div className="flex gap-0.5 mb-10 items-center">
+        <div className="flex flex-wrap gap-0.5 mb-10 items-center">
           {(['today', 'all', 'week', 'archive'] as const).map((v) => {
             const isActive = view === v
             return (
               <button
                 key={v}
-                className={`font-mono text-[11px] tracking-[0.1em] uppercase pr-3.5 mr-4.5 py-2 relative transition-colors ${
+                className={`font-mono text-[11px] tracking-[0.1em] uppercase pr-3.5 mr-2 sm:mr-4.5 py-2 relative transition-colors ${
                   isActive
                     ? 'text-ink after:content-[""] after:absolute after:left-0 after:right-[18px] after:bottom-0.5 after:h-px after:bg-accent'
                     : 'text-ink-faded hover:text-ink-soft'
@@ -279,9 +279,9 @@ function AppShell() {
               </button>
             )
           })}
-          <span className="flex-1" />
+          <span className="flex-1 min-w-0" />
           <button
-            className="font-mono text-[11px] tracking-[0.1em] uppercase text-paper bg-ink px-3.5 py-2.5 rounded-sm hover:bg-accent transition-colors"
+            className="font-mono text-[11px] tracking-[0.1em] uppercase text-paper bg-ink px-3.5 py-2.5 rounded-sm hover:bg-accent transition-colors w-full sm:w-auto mt-2 sm:mt-0"
             onClick={() => setChatOpen(true)}
           >
             <span className="mr-1.5 opacity-70">+</span> Comandă nouă
