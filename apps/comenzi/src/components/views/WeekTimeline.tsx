@@ -4,10 +4,10 @@ import { DAYS_RO_SHORT, MONTHS_RO } from '@/lib/constants'
 import { dayDiff, fmtTime } from '@/lib/dates'
 
 const statusDotColor: Record<string, string> = {
-  oferta:    'bg-transparent border border-amber',
-  nou:       'bg-amber',
-  'in-lucru': 'bg-accent',
-  finalizat: 'bg-green opacity-60',
+  oferta:     'bg-status-oferta',
+  nou:        'bg-transparent border border-status-nou',
+  'in-lucru': 'bg-status-lucru',
+  finalizat:  'bg-status-finalizat',
 }
 
 interface Props {

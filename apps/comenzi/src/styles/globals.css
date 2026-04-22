@@ -13,6 +13,15 @@
   --green:       #2E6F5E;
   --amber:       #8B6B2E;
 
+  --status-oferta:       #8B6B2E;
+  --status-oferta-bg:    #F5EBD8;
+  --status-nou:          #4a5568;
+  --status-nou-bg:       transparent;
+  --status-lucru:        #3B7A9E;
+  --status-lucru-bg:     #DDE9F1;
+  --status-finalizat:    #2E6F5E;
+  --status-finalizat-bg: #D6E8DF;
+
   --f-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
   --f-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
   --f-text:    'Fraunces', Georgia, serif;
@@ -30,6 +39,15 @@
   --color-accent-soft: var(--accent-soft);
   --color-green:       var(--green);
   --color-amber:       var(--amber);
+
+  --color-status-oferta:       var(--status-oferta);
+  --color-status-oferta-bg:    var(--status-oferta-bg);
+  --color-status-nou:          var(--status-nou);
+  --color-status-nou-bg:       var(--status-nou-bg);
+  --color-status-lucru:        var(--status-lucru);
+  --color-status-lucru-bg:     var(--status-lucru-bg);
+  --color-status-finalizat:    var(--status-finalizat);
+  --color-status-finalizat-bg: var(--status-finalizat-bg);
 
   --font-family-display: var(--f-display);
   --font-family-mono:    var(--f-mono);

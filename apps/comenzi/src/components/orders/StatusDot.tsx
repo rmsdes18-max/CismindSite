@@ -2,10 +2,10 @@ import type { OrderStatus } from '@/types/order'
 import { nextStatus, statusLabel } from '@/lib/dates'
 
 const dotStyles: Record<OrderStatus, string> = {
-  oferta:    'bg-transparent border-[1.5px] border-amber',
-  nou:       'bg-amber',
-  'in-lucru': 'bg-accent shadow-[0_0_0_3px_rgba(231,0,80,0.15)]',
-  finalizat: 'bg-green opacity-60',
+  oferta:     'bg-status-oferta',
+  nou:        'bg-transparent border-[1.5px] border-status-nou',
+  'in-lucru': 'bg-status-lucru shadow-[0_0_0_3px_rgba(59,122,158,0.15)]',
+  finalizat:  'bg-status-finalizat',
 }
 
 interface Props {
