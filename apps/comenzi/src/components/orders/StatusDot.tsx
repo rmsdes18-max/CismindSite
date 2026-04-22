@@ -16,7 +16,7 @@ interface Props {
 export function StatusDot({ status, onAdvance }: Props) {
   return (
     <button
-      className={`w-2.5 h-2.5 rounded-full mt-2.5 shrink-0 justify-self-start transition-transform hover:scale-130 ${dotStyles[status]}`}
+      className={`w-2.5 h-2.5 rounded-full mt-2.5 shrink-0 justify-self-end sm:justify-self-start order-2 sm:order-1 transition-transform hover:scale-130 ${dotStyles[status]}`}
       onClick={(e) => {
         e.stopPropagation()
         onAdvance()
