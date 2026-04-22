@@ -10,7 +10,7 @@ export function ProductList({ items }: Props) {
       {items.map((it, i) => (
         <li
           key={i}
-          className="grid grid-cols-[28px_1fr_auto] gap-2.5 py-2.5 border-b border-dashed border-rule last:border-b-0 items-baseline"
+          className="grid grid-cols-[28px_1fr_auto] gap-2.5 py-2.5 border-b border-accent-soft last:border-b-0 items-baseline"
         >
           <span className="font-mono text-[10px] text-ink-faded tracking-[0.05em]">
             {String(i + 1).padStart(2, '0')}

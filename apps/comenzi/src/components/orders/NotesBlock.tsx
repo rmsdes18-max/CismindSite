@@ -26,12 +26,6 @@ export function NotesBlock({ notes, onAddNote }: Props) {
         </span>
       </div>
 
-      {notes.length === 0 && (
-        <div className="font-mono text-[11px] text-ink-faded py-1 pb-2.5 tracking-[0.03em]">
-          — fără note —
-        </div>
-      )}
-
       {notes.length > 0 && (
         <ul className="list-none m-0 mb-2.5 p-0">
           {notes.map((n, i) => (

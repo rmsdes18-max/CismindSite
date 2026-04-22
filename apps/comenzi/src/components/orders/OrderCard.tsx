@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import type { Order, OrderItem, OrderStatus } from '@/types/order'
 import { CHANNELS } from '@/lib/constants'
-import { dayDiff, fmtTime, fmtDateShort } from '@/lib/dates'
+import { dayDiff, fmtDateShort } from '@/lib/dates'
+import { formatPhone } from '@/lib/format'
 import { StatusDot } from './StatusDot'
 import { StatusPills } from './StatusPills'
 import { ProductList } from './ProductList'
 import { AddProductForm } from './AddProductForm'
-import { VersionsBlock } from './VersionsBlock'
+// TODO: reactivare versiuni când business-ul cere iterații vizuale
+// import { VersionsBlock } from './VersionsBlock'
 import { NotesBlock } from './NotesBlock'
 import { DriveFolders } from './DriveFolders'
 
@@ -28,7 +30,7 @@ export function OrderCard({
   onToggle,
   onChangeStatus,
   onAddNote,
-  onAddVersion,
+  onAddVersion: _onAddVersion,
   onAddItem,
   onDelete,
   showDeadline = true,
@@ -76,17 +78,22 @@ export function OrderCard({
           </span>
           {order.name}
         </h3>
-        <div className="font-mono text-[13px] text-ink-soft flex flex-wrap gap-x-3.5 gap-y-0.5 leading-6">
-          <span className="text-ink">{order.client}</span>
-          <span className="text-rule">·</span>
-          <span>{itemSummary}</span>
-          <span className="text-rule">·</span>
-          <span className="text-ink-faded">{CHANNELS[order.channel]}</span>
+        <div className="font-mono text-[13px] text-ink-soft leading-6">
+          <div className="flex flex-wrap gap-x-3.5 gap-y-0.5">
+            <span className="text-ink">{order.client}</span>
+            <span className="text-rule">·</span>
+            <span>{formatPhone(order.contact)}</span>
+          </div>
+          <div className="flex flex-wrap gap-x-3.5 gap-y-0.5">
+            <span>{itemSummary}</span>
+            <span className="text-rule">·</span>
+            <span className="text-ink-faded">{CHANNELS[order.channel]}</span>
+          </div>
         </div>
 
         {isOpen && (
           <div
-            className="col-span-full pt-3.5 mt-3.5 border-t border-dashed border-rule grid grid-cols-2 gap-y-4.5 gap-x-8"
+            className="col-span-full pt-2.5 mt-2.5 border-t border-dashed border-rule grid grid-cols-2 gap-y-3 gap-x-8"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Meta fields */}
@@ -95,14 +102,14 @@ export function OrderCard({
                 Client · {CHANNELS[order.channel]}
               </span>
               <span className="text-ink">{order.client}</span>
-              <div className="font-mono text-[11px] text-ink-faded mt-0.5">{order.contact}</div>
+              <div className="font-mono text-[11px] text-ink-faded mt-0.5">{formatPhone(order.contact)}</div>
             </div>
             <div className="font-mono text-sm leading-relaxed">
               <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
                 Deadline
               </span>
-              <span className="text-ink">
-                {fmtDateShort(order.deadline)} · {fmtTime(order.deadline)}
+              <span className="text-ink font-semibold">
+                {fmtDateShort(order.deadline)}
               </span>
             </div>
 
@@ -136,10 +143,7 @@ export function OrderCard({
               )}
             </div>
 
-            <VersionsBlock
-              versions={order.versions}
-              onAddVersion={(note) => onAddVersion(order.id, note)}
-            />
+            {/* TODO: reactivare versiuni când business-ul cere iterații vizuale */}
 
             <NotesBlock
               notes={order.notes}
@@ -168,11 +172,8 @@ export function OrderCard({
       </div>
 
       {!isOpen && showDeadline && (
-        <div className={`text-right font-mono text-xs text-ink-soft whitespace-nowrap pt-0.5 leading-[1.4] ${isUrgent ? '' : ''}`}>
-          <span className={`block text-[15px] tracking-[-0.01em] ${isUrgent ? 'text-accent' : 'text-ink'}`}>
-            {fmtTime(order.deadline)}
-          </span>
-          <span className="block mt-0.5 text-[10px] tracking-[0.08em] uppercase text-ink-faded">
+        <div className="text-right font-mono whitespace-nowrap pt-0.5">
+          <span className={`block text-sm tracking-[-0.01em] ${isUrgent ? 'text-accent font-semibold' : 'text-ink'}`}>
             {fmtDateShort(order.deadline)}
           </span>
         </div>

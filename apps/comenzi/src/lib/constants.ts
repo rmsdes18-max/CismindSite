@@ -17,6 +17,11 @@ export const PEOPLE = ['Andrei', 'Mihaela', 'Radu'] as const
 
 export const CURRENT_USER = 'Andrei'
 
+export const FOLDER_LABELS = {
+  input: 'Primit',
+  final: 'De printat',
+} as const
+
 export const DAYS_RO = ['duminică', 'luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă']
 export const DAYS_RO_SHORT = ['dum', 'lun', 'mar', 'mie', 'joi', 'vin', 'sâm']
 export const MONTHS_RO = [
