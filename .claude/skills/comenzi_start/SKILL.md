@@ -4,22 +4,55 @@ description: Raport complet proiect Cismind Comenzi — status, ce s-a făcut, c
 user_invocable: true
 ---
 
-Când userul invocă /start, afișează acest raport:
+Când userul invocă /start, execută ÎNTÂI aceste comenzi (readonly) și include output-ul în raport:
+
+1. `git branch --show-current` — branch-ul activ
+2. `git log --oneline -5` — ultimele 5 commits
+3. `gh issue list --state open --limit 10 2>/dev/null || echo "No GitHub issues or gh not configured"` — issues deschise
+4. `git log --oneline feat/design-refinements --not main 2>/dev/null | wc -l` — commits ahead of main
+
+Apoi afișează raportul static de mai jos, COMPLETAT cu datele live de sus:
 
 ---
 
 # Cismind Comenzi · Raport proiect
 
-**Data:** 22 aprilie 2026
 **Repo:** github.com/rmsdes18-max/CismindSite
-**Branch activ:** `feat/design-refinements` (10 commits ahead of main)
-**Branch main:** checkpoint faza 3 completă + soft delete
 **App path:** `apps/comenzi/` în monorepo pnpm workspace
 **Stack:** React 18 + TypeScript + Vite 6 + Tailwind v4 + TanStack Query + Sonner
 
+## GIT STATE (live — completează cu output-ul comenzilor)
+> - **Branch curent:** (din `git branch --show-current`)
+> - **Ultimele 5 commits:** (din `git log --oneline -5`)
+> - **Commits ahead of main:** (din `git log --oneline feat/design-refinements --not main | wc -l`)
+> - **GitHub Issues deschise:** (din `gh issue list --state open --limit 10`)
+
+## FAZE TERMINATE
+
+| Fază | Status | Branch |
+|------|--------|--------|
+| Faza 1 — Setup proiect | ✅ | main |
+| Faza 2 — Componente prezentaționale | ✅ | main |
+| Faza 3 — Google Integration (3.1-3.5) | ✅ | main |
+| Soft delete + Arhivă | ✅ | main |
+| Design Refinements (A-D) | ✅ | feat/design-refinements |
+| Mobile responsive | ✅ | feat/design-refinements |
+| Inline editing + delete | ✅ | feat/design-refinements |
+| Card redesign (popover + checkboxes) | ✅ | feat/design-refinements |
+| Faza 4 — Auth guard & security | ⬜ | — |
+| Faza 5 — Polish + deployment | ⬜ | — |
+
+## NEXT STEP
+
+1. **Imediat:** PR review `feat/design-refinements` → `main`
+2. **După merge:** Deploy pe Netlify/Vercel cu domeniu `comenzi.cismind.ro`
+3. **După deploy:** Adaugă domeniul în Google Cloud Console → Authorized Origins
+4. **Apoi:** Faza 4 (CSP, security) sau Faza 5 (polish, shortcuts, error boundaries)
+5. **Testare echipă:** Andrei, Mihaela, Radu
+
 ---
 
-## CE S-A FĂCUT
+## CE S-A FĂCUT (DETALII)
 
 ### Faza 1 — Setup proiect ✅
 - `apps/comenzi/` creat ca workspace package în monorepo
