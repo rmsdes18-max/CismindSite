@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --paper:       #F5F1EA;
+  --paper-deep:  #EDE6D9;
+  --ink:         #1F1B16;
+  --ink-soft:    #56504A;
+  --ink-faded:   #8B857E;
+  --rule:        #D9D1C2;
+  --rule-soft:   #E6DFD1;
+  --accent:      #C14A28;
+  --accent-soft: #E8B9A8;
+  --green:       #2E6F5E;
+  --amber:       #8B6B2E;
+
+  --f-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --f-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --f-text:    'Fraunces', Georgia, serif;
+}
+
+@theme inline {
+  --color-paper:       var(--paper);
+  --color-paper-deep:  var(--paper-deep);
+  --color-ink:         var(--ink);
+  --color-ink-soft:    var(--ink-soft);
+  --color-ink-faded:   var(--ink-faded);
+  --color-rule:        var(--rule);
+  --color-rule-soft:   var(--rule-soft);
+  --color-accent:      var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-green:       var(--green);
+  --color-amber:       var(--amber);
+
+  --font-family-display: var(--f-display);
+  --font-family-mono:    var(--f-mono);
+  --font-family-text:    var(--f-text);
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-text);
+    font-feature-settings: "ss01", "ss02";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100vh;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  input, textarea {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    outline: none;
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

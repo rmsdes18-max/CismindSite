@@ -1,27 +1,25 @@
 import { Navbar } from "./Navbar";
 import { HeroSection } from "./HeroSection";
 import { ProductsSection } from "./ProductsSection";
-import { ColorDivider, ServicesSection } from "./ServicesSection";
+import { ServicesSection } from "./ServicesSection";
 import { HowItWorksSection } from "./HowItWorksSection";
 import { OrderForm } from "./OrderForm";
-
-function PerforatedDivider({ topColor, bottomColor }: { topColor: string; bottomColor: string }) {
-  return null;
-}
+import { ServicesGrid } from "./ServicesGrid";
+import { Footer } from "./Footer";
+import { CookieBanner } from "./CookieBanner";
 
 export function SiteLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <HeroSection />
-      <PerforatedDivider topColor="#f2e8de" bottomColor="#f7f4fb" />
-      <ProductsSection />
-      <PerforatedDivider topColor="#f7f4fb" bottomColor="#f2e8de" />
-      <ColorDivider />
-      <ServicesSection />
-      <ColorDivider />
-      <HowItWorksSection />
-      <OrderForm />
+      <section id="hero"><HeroSection /></section>
+      <section id="produse"><ProductsSection /></section>
+      <section id="servicii"><ServicesSection /></section>
+      <section id="cum-functioneaza"><HowItWorksSection /></section>
+      <ServicesGrid />
+      <section id="cerere-oferta"><OrderForm /></section>
+      <Footer />
+      <CookieBanner />
     </div>
   );
 }

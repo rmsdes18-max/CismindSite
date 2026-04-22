@@ -8,6 +8,8 @@ export type GalleryPhoto = {
   label: string;
   tag: string;
   accent: string;
+  /** CSS object-position value, e.g. "center center", "top center", "50% 30%" */
+  objectPosition?: string;
 };
 
 export type ProductCard = {
@@ -18,6 +20,8 @@ export type ProductCard = {
 export type ProductTab = {
   id: string;
   label: string;
+  color: string;
+  colorLight: string;
   products: ProductCard[];
 };
 
@@ -32,73 +36,89 @@ export type SiteData = {
 // ── Default data ──────────────────────────────────────────────────────────────
 
 export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
+  // ── Page 1 ──
   {
     id: "g1",
-    src: "https://images.unsplash.com/photo-1609837784093-0d850eca5fde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: "/gallery/stikere-colectie.jpg",
     label: "Stikere Die-Cut",
     tag: "Stikere",
     accent: "#d30052",
   },
   {
     id: "g2",
-    src: "https://images.unsplash.com/photo-1773525912476-213bff96b8a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Tricouri Personalizate",
+    src: "/gallery/hanorac-personalizat.jpg",
+    label: "Hanorac Personalizat",
     tag: "Textile",
     accent: "#5e3279",
   },
   {
     id: "g3",
-    src: "https://images.unsplash.com/photo-1685643096239-9b517edf150f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Tablouri Canvas",
-    tag: "Canvas",
+    src: "/gallery/cutii-print-uv.jpg",
+    label: "Cutii Print UV",
+    tag: "Print Digital",
     accent: "#222b37",
   },
   {
     id: "g4",
-    src: "https://images.unsplash.com/photo-1670067608901-236c6d61d215?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Rulouri Vinil Color",
-    tag: "Stikere",
-    accent: "#d30052",
+    src: "/gallery/gravura-lemn.jpg",
+    label: "Gravură Laser Lemn",
+    tag: "Gravură",
+    accent: "#5e3279",
   },
   {
     id: "g5",
-    src: "https://images.unsplash.com/photo-1617355405361-29f0f0a3d737?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Roll-Up & Bannere",
+    src: "/gallery/banner-casino.jpg",
+    label: "Banner Premium",
     tag: "Bannere",
     accent: "#f5a623",
   },
   {
     id: "g6",
-    src: "https://images.unsplash.com/photo-1718670013921-2f144aba173a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: "/gallery/carti-vizita.jpg",
     label: "Cărți de Vizită",
     tag: "Print Digital",
     accent: "#222b37",
   },
+  // ── Page 2 ──
   {
     id: "g7",
-    src: "https://images.unsplash.com/photo-1693031630369-bd429a57f115?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: "/gallery/stikere-cismind.jpg",
+    label: "Stikere Logo Cismind",
+    tag: "Stikere",
+    accent: "#d30052",
+  },
+  {
+    id: "g8",
+    src: "/gallery/print-casino.jpg",
+    label: "Print Premium Casino",
+    tag: "Print Digital",
+    accent: "#222b37",
+  },
+  {
+    id: "g9",
+    src: "/gallery/decupaj-lemn.jpg",
+    label: "Decupaj Lemn",
+    tag: "Gravură",
+    accent: "#5e3279",
+  },
+  {
+    id: "g10",
+    src: "/gallery/print-format-mare.jpg",
     label: "Print Format Mare",
     tag: "Bannere",
     accent: "#f5a623",
   },
   {
-    id: "g8",
-    src: "https://images.unsplash.com/photo-1774520504555-1afc8a82e024?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Gravură Lemn",
-    tag: "Gravură",
+    id: "g11",
+    src: "/gallery/tricou-smelly-cat.jpg",
+    label: "Tricou Personalizat",
+    tag: "Textile",
     accent: "#5e3279",
   },
   {
-    id: "g9",
-    src: "https://images.unsplash.com/photo-1695634281181-b2357af34c61?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Broșuri & Flyere",
-    tag: "Print Digital",
-    accent: "#d30052",
-  },
-  {
-    id: "g10",
-    src: "https://images.unsplash.com/photo-1585377038583-e23df03ec7fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    label: "Gravură Acril",
+    id: "g12",
+    src: "/gallery/gravura-actiune.jpg",
+    label: "Gravură în Acțiune",
     tag: "Gravură",
     accent: "#222b37",
   },
@@ -108,6 +128,8 @@ export const DEFAULT_PRODUCT_TABS: ProductTab[] = [
   {
     id: "tab-stikere",
     label: "Stikere",
+    color: "#ffa300",
+    colorLight: "#fff4dd",
     products: [
       { id: "p1", title: "Stikere Standard" },
       { id: "p2", title: "Transparente" },
@@ -118,6 +140,8 @@ export const DEFAULT_PRODUCT_TABS: ProductTab[] = [
   {
     id: "tab-textile",
     label: "Textile",
+    color: "#e70050",
+    colorLight: "#ffd7e9",
     products: [
       { id: "p5", title: "Tricouri" },
       { id: "p6", title: "Hanorace" },
@@ -128,6 +152,8 @@ export const DEFAULT_PRODUCT_TABS: ProductTab[] = [
   {
     id: "tab-canva",
     label: "Canva",
+    color: "#7b2fa0",
+    colorLight: "#f0e0ff",
     products: [
       { id: "p9", title: "Canvas Clasic" },
       { id: "p10", title: "Canvas Panoramic" },
@@ -137,6 +163,8 @@ export const DEFAULT_PRODUCT_TABS: ProductTab[] = [
   {
     id: "tab-bannere",
     label: "Bannere",
+    color: "#2e8b57",
+    colorLight: "#e0f5ea",
     products: [
       { id: "p12", title: "Roll-Up" },
       { id: "p13", title: "Banner Exterior" },
@@ -147,6 +175,8 @@ export const DEFAULT_PRODUCT_TABS: ProductTab[] = [
   {
     id: "tab-print",
     label: "Print Digital",
+    color: "#1a6fd4",
+    colorLight: "#ddeeff",
     products: [
       { id: "p16", title: "Flyere" },
       { id: "p17", title: "Cărți de Vizită" },
@@ -157,6 +187,8 @@ export const DEFAULT_PRODUCT_TABS: ProductTab[] = [
   {
     id: "tab-gravura",
     label: "Gravura",
+    color: "#2c3e50",
+    colorLight: "#e8ecf0",
     products: [
       { id: "p20", title: "Gravură Lemn" },
       { id: "p21", title: "Gravură Metal" },
@@ -170,7 +202,7 @@ export const DEFAULT_SITE_DATA: SiteData = {
   productTabs: DEFAULT_PRODUCT_TABS,
   exploreSectionTitle: "Ce poți",
   exploreSectionSubtitle: "comanda",
-  contactEmail: "rms.des18@gmail.com",
+  contactEmail: "comenzi@cismind.ro",
 };
 
 // ── Storage key ───────────────────────────────────────────────────────────────

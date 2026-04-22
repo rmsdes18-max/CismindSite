@@ -134,6 +134,72 @@ function BottomNav({ active, onChange }: { active: AdminTab; onChange: (t: Admin
   );
 }
 
+// ── Position picker (3×3 grid) ───────────────────────────────────────────────
+
+const POSITIONS = [
+  { label: "↖", value: "top left" },
+  { label: "↑", value: "top center" },
+  { label: "↗", value: "top right" },
+  { label: "←", value: "center left" },
+  { label: "●", value: "center center" },
+  { label: "→", value: "center right" },
+  { label: "↙", value: "bottom left" },
+  { label: "↓", value: "bottom center" },
+  { label: "↘", value: "bottom right" },
+];
+
+function PositionPicker({
+  value,
+  onChange,
+  previewSrc,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  previewSrc?: string;
+}) {
+  const current = value || "center center";
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-white/50 text-[11px] uppercase tracking-widest" style={{ fontFamily: "Inter, sans-serif" }}>
+        Poziție imagine (focus)
+      </label>
+      <div className="flex items-start gap-3">
+        {/* 3×3 grid */}
+        <div className="grid grid-cols-3 gap-1 flex-shrink-0" style={{ width: 72 }}>
+          {POSITIONS.map((pos) => (
+            <button
+              key={pos.value}
+              type="button"
+              onClick={() => onChange(pos.value)}
+              className="w-[22px] h-[22px] flex items-center justify-center text-[10px] transition-all"
+              style={{
+                background: current === pos.value ? "#d30052" : "rgba(255,255,255,0.06)",
+                color: current === pos.value ? "#fff" : "rgba(255,255,255,0.3)",
+                border: `1px solid ${current === pos.value ? "#d30052" : "rgba(255,255,255,0.1)"}`,
+              }}
+              title={pos.value}
+            >
+              {pos.label}
+            </button>
+          ))}
+        </div>
+        {/* Live preview */}
+        {previewSrc && (
+          <div className="w-24 h-16 overflow-hidden flex-shrink-0" style={{ background: "#2a2f3e", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <img
+              src={previewSrc}
+              alt="preview"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: current }}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Gallery editor ────────────────────────────────────────────────────────────
 
 function GalleryEditor({
@@ -148,6 +214,7 @@ function GalleryEditor({
     label: "",
     tag: "",
     accent: "#d30052",
+    objectPosition: "center center",
   });
   const [addOpen, setAddOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -165,7 +232,7 @@ function GalleryEditor({
     if (!newPhoto.src || !newPhoto.label) return;
     const photo: GalleryPhoto = { ...newPhoto, id: `g${Date.now()}` };
     onChange([...photos, photo]);
-    setNewPhoto({ src: "", label: "", tag: "", accent: "#d30052" });
+    setNewPhoto({ src: "", label: "", tag: "", accent: "#d30052", objectPosition: "center center" });
     setAddOpen(false);
   }
 
@@ -254,12 +321,17 @@ function GalleryEditor({
               </label>
               <AccentPicker value={newPhoto.accent} onChange={(v) => setNewPhoto({ ...newPhoto, accent: v })} />
             </div>
+            <PositionPicker
+              value={newPhoto.objectPosition ?? "center center"}
+              onChange={(v) => setNewPhoto({ ...newPhoto, objectPosition: v })}
+              previewSrc={newPhoto.src || undefined}
+            />
           </div>
 
           {/* Preview */}
           {newPhoto.src && (
             <div className="flex items-center gap-3 p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <img src={newPhoto.src} alt="preview" className="w-20 h-14 object-cover flex-shrink-0" onError={(e) => (e.currentTarget.style.display = "none")} />
+              <img src={newPhoto.src} alt="preview" className="w-20 h-14 object-cover flex-shrink-0" style={{ objectPosition: newPhoto.objectPosition ?? "center center" }} onError={(e) => (e.currentTarget.style.display = "none")} />
               <div>
                 <p className="text-white text-[13px]" style={{ fontFamily: "Mulish, sans-serif", fontWeight: 600 }}>{newPhoto.label || "—"}</p>
                 <span className="inline-block mt-1 px-2 py-0.5 text-white text-[10px]" style={{ background: newPhoto.accent, fontFamily: "Mulish, sans-serif", fontWeight: 700 }}>
@@ -341,7 +413,7 @@ function PhotoRow({
           src={photo.src}
           alt={photo.label}
           className="w-14 h-10 sm:w-20 sm:h-14 object-cover flex-shrink-0"
-          style={{ background: "#2a2f3e" }}
+          style={{ background: "#2a2f3e", objectPosition: photo.objectPosition ?? "center center" }}
           onError={(e) => { (e.currentTarget as HTMLImageElement).style.background = "#2a2f3e"; }}
         />
         <div className="flex-1 min-w-0">
@@ -432,6 +504,11 @@ function PhotoRow({
               </label>
               <AccentPicker value={photo.accent} onChange={(v) => onUpdate("accent", v)} />
             </div>
+            <PositionPicker
+              value={photo.objectPosition ?? "center center"}
+              onChange={(v) => onUpdate("objectPosition", v)}
+              previewSrc={photo.src}
+            />
           </div>
         </div>
       )}
@@ -795,11 +872,74 @@ const TAB_LABELS: Record<AdminTab, string> = {
   settings: "Setări",
 };
 
+const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH as string;
+const AUTH_KEY = "cismind_admin_auth";
+
+async function sha256(text: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function PasswordGate({ onAuth }: { onAuth: () => void }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const hash = await sha256(password);
+    if (hash === ADMIN_PASSWORD_HASH) {
+      sessionStorage.setItem(AUTH_KEY, "1");
+      onAuth();
+    } else {
+      setError(true);
+      setPassword("");
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#1a1f29" }}>
+      <form onSubmit={handleSubmit} className="w-full max-w-sm p-8 rounded-lg" style={{ background: "#141820", border: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="flex gap-1 mb-6">
+          {["#d30052", "#5e3279", "#222b37", "#f5a623"].map((c) => (
+            <div key={c} className="h-1 flex-1 rounded-full" style={{ background: c }} />
+          ))}
+        </div>
+        <h1 className="text-white text-lg font-bold mb-1" style={{ fontFamily: "Mulish, sans-serif" }}>Cismind Admin</h1>
+        <p className="text-white/40 text-xs mb-6" style={{ fontFamily: "Inter, sans-serif" }}>Introduceți parola pentru a continua</p>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => { setPassword(e.target.value); setError(false); }}
+          placeholder="Parolă"
+          className="w-full px-4 py-2.5 rounded text-sm text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#d30052]"
+          style={{ background: "#1a1f29", border: "1px solid rgba(255,255,255,0.1)" }}
+          autoFocus
+        />
+        {error && <p className="text-red-400 text-xs mt-2">Parolă incorectă.</p>}
+        <button
+          type="submit"
+          className="w-full mt-4 py-2.5 rounded text-sm font-semibold text-white transition-colors"
+          style={{ background: "#d30052" }}
+        >
+          Autentificare
+        </button>
+      </form>
+    </div>
+  );
+}
+
 export function AdminDashboard() {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === "1");
   const [activeTab, setActiveTab] = useState<AdminTab>("gallery");
   const [data, setData] = useState<SiteData>(() => loadSiteData());
   const [dirty, setDirty] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  if (!authed) {
+    return <PasswordGate onAuth={() => setAuthed(true)} />;
+  }
 
   function updateData(partial: Partial<SiteData>) {
     setData((prev) => ({ ...prev, ...partial }));

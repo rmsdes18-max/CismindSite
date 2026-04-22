@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISMIND — Configurator + Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#e70050;
+  --purple:#652f7d;
+  --orange:#ffa300;
+  --dark:#202b38;
+  --cream:#f5ece0;
+  --lavender:#f7f4fb;
+  --text-primary:#202b38;
+  --text-secondary:#445e79;
+  --border-soft:#e0d9e6;
+  --border-mid:#c9bcd4;
+  --border-line:#99aec5;
+  --card-bg:#ffffff;
+  --font-display:'Mulish',-apple-system,sans-serif;
+  --font-ui:'Inter',-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-display);background:var(--cream);color:var(--text-primary);font-size:14px;min-height:100vh;padding:24px 0}
+.page{max-width:1340px;margin:0 auto;padding:24px;background:#fff;border-radius:20px;border:1px solid var(--border-soft);box-shadow:0 2px 16px rgba(32,43,56,.06)}
+
+/* Top bar */
+.top-bar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+h1{font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-.6px;margin-bottom:4px;background:linear-gradient(90deg,#ffa300 0%,#e70050 50%,#652f7d 100%);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.15}
+.subtitle{font-family:var(--font-ui);color:var(--text-secondary);font-size:12px;font-weight:500}
+.mode-toggle{display:flex;gap:0;border:1.5px solid var(--dark);border-radius:10px;overflow:hidden;font-family:var(--font-ui)}
+.mode-btn{padding:8px 18px;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;border:none;background:#fff;color:var(--dark);font-family:inherit;transition:all .18s}
+.mode-btn.active{background:var(--dark);color:#fff}
+.mode-btn:hover:not(.active){background:var(--lavender)}
+
+.layout{display:grid;grid-template-columns:1fr 500px;gap:28px;align-items:start}
+
+/* Form */
+.form-col{display:flex;flex-direction:column;gap:18px}
+.fg{}
+.fl{font-family:var(--font-ui);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-secondary);margin-bottom:6px}
+select{width:100%;padding:11px 36px 11px 14px;font-size:13px;font-family:var(--font-display);font-weight:500;color:var(--text-primary);border:1.5px solid var(--border-line);border-radius:10px;background:#fff;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5' stroke='%23445e79' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer;transition:border-color .18s,box-shadow .18s}
+select:hover{border-color:var(--text-secondary)}
+select:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 3px rgba(231,0,80,.1)}
+select:disabled{background:#f5f5f5;color:#999;cursor:not-allowed}
+.qty-row{display:flex;align-items:center}
+.qty-btn{width:40px;height:40px;border:1.5px solid var(--border-line);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dark);user-select:none;transition:all .15s;font-weight:600}
+.qty-btn:first-child{border-radius:10px 0 0 10px;border-right:none}
+.qty-btn:last-child{border-radius:0 10px 10px 0;border-left:none}
+.qty-btn:hover{background:var(--dark);color:#fff;border-color:var(--dark)}
+.qty-input{width:72px;height:40px;border:1.5px solid var(--border-line);border-left:none;border-right:none;text-align:center;font-size:15px;font-weight:700;font-family:var(--font-display);color:var(--text-primary)}
+.qty-input:focus{outline:none}
+textarea,input[type="text"],input[type="email"],input[type="tel"],input[type="url"]{width:100%;border:1.5px solid var(--border-line);border-radius:10px;padding:10px 12px;font-size:13px;font-family:var(--font-display);color:var(--text-primary);transition:border-color .18s,box-shadow .18s}
+textarea{resize:vertical;min-height:70px}
+textarea:focus,input:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 3px rgba(231,0,80,.1)}
+.divider{border:none;border-top:1px solid var(--border-soft);margin:6px 0}
+.section-title{font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--text-primary);padding-top:2px}
+.addon-box{border:1.5px solid var(--border-soft);border-radius:12px;padding:14px;background:var(--lavender)}
+.addon-header{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.addon-header input[type="checkbox"]{width:16px;height:16px;accent-color:var(--pink);cursor:pointer}
+.addon-header label{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text-primary);cursor:pointer}
+.addon-header .addon-desc{font-family:var(--font-ui);font-size:10px;color:var(--purple);margin-left:auto;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.addon-body{margin-top:12px;display:none}
+.addon-body.open{display:block}
+
+/* Right panel */
+.panel-col{position:sticky;top:20px;max-height:calc(100vh - 60px);overflow-y:auto;padding-right:6px}
+.panel-col::-webkit-scrollbar{width:6px}
+.panel-col::-webkit-scrollbar-track{background:var(--cream);border-radius:3px}
+.panel-col::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:3px}
+.panel-col::-webkit-scrollbar-thumb:hover{background:var(--text-secondary)}
+
+/* Client view */
+.preview-box{width:100%;aspect-ratio:4/3;border:2px dashed var(--border-mid);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--text-secondary);margin-bottom:16px;gap:8px;background:var(--lavender)}
+.preview-icon{font-size:48px;opacity:.35}
+.preview-text{font-family:var(--font-display);font-size:13px;font-weight:700}
+.summary-box{border:1.5px solid var(--border-soft);border-radius:12px;overflow:hidden;margin-bottom:14px;background:#fff}
+.summary-header{background:var(--cream);padding:10px 14px;font-family:var(--font-ui);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--dark);border-bottom:1px solid var(--border-soft)}
+.summary-row{display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border-soft);font-size:12px;font-family:var(--font-display)}
+.summary-row:last-child{border-bottom:none}
+.summary-key{color:var(--text-secondary);font-weight:500}
+.summary-val{font-weight:700;text-align:right;max-width:60%;color:var(--text-primary)}
+.summary-empty{padding:18px 14px;color:var(--text-secondary);font-size:12px;text-align:center;font-style:italic}
+.btn-submit{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--pink) 0%,var(--purple) 100%);color:#fff;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;font-family:var(--font-ui);transition:transform .15s,box-shadow .15s}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(231,0,80,.25)}
+.btn-submit:active{transform:translateY(0)}
+
+/* Admin view */
+.admin-panel{font-size:12px;font-family:var(--font-display)}
+.admin-cat-title{font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--cream);color:var(--text-primary)}
+.admin-step{border:1.5px solid var(--border-soft);border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fff}
+.admin-step-header{background:var(--lavender);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;transition:background .15s}
+.admin-step-header:hover{background:#efe7f5}
+.admin-step-label{font-family:var(--font-display);font-weight:800;font-size:12px;color:var(--text-primary)}
+.admin-step-actions{display:flex;gap:4px}
+.admin-step-actions button{background:#fff;border:1px solid var(--border-mid);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:var(--font-ui);font-weight:600;color:var(--dark);transition:all .15s}
+.admin-step-actions button:hover{background:var(--dark);color:#fff;border-color:var(--dark)}
+.admin-step-actions button.del{color:var(--pink);border-color:var(--pink)}
+.admin-step-actions button.del:hover{background:var(--pink);color:#fff}
+.admin-step-body{padding:12px;display:none}
+.admin-step-body.open{display:block}
+
+/* Visual cards grid */
+.visual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:10px;margin-bottom:10px}
+.visual-card{border:1.5px solid var(--border-soft);border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .18s;position:relative;min-height:96px;justify-content:center;background:#fff}
+.visual-card:hover{border-color:var(--orange);box-shadow:0 4px 12px rgba(255,163,0,.15);transform:translateY(-1px)}
+.visual-card svg{width:48px;height:48px;flex-shrink:0;color:var(--dark)}
+.visual-card .vc-name{font-family:var(--font-display);font-size:10px;font-weight:700;text-align:center;line-height:1.25;word-break:break-word;max-width:85px;color:var(--text-primary)}
+.visual-card .vc-del{position:absolute;top:3px;right:5px;background:none;border:none;color:var(--pink);font-size:15px;font-weight:700;cursor:pointer;opacity:0;transition:opacity .15s;line-height:1}
+.visual-card:hover .vc-del{opacity:1}
+
+/* Material list */
+.mat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.mat-item{border:1.5px solid var(--border-soft);border-left:3px solid var(--pink);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;position:relative;background:#fff;transition:all .15s}
+.mat-item:hover{border-color:var(--pink);border-left-color:var(--pink);box-shadow:0 2px 8px rgba(231,0,80,.08)}
+.mat-name{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text-primary)}
+.mat-url{font-family:var(--font-ui);font-size:10px;color:var(--pink);text-decoration:none;word-break:break-all;font-weight:500}
+.mat-url:hover{text-decoration:underline;color:var(--purple)}
+.mat-note{font-family:var(--font-ui);font-size:10px;color:var(--purple);font-style:italic;font-weight:500}
+.mat-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px}
+.mat-actions button{background:#fff;border:1px solid var(--border-mid);border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer;font-family:var(--font-ui);font-weight:600;color:var(--dark);transition:all .15s}
+.mat-actions button:hover{background:var(--dark);color:#fff}
+.mat-actions button.del{color:var(--pink);border-color:var(--pink)}
+.mat-actions button.del:hover{background:var(--pink);color:#fff}
+
+/* Dimension diagrams */
+.dim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:10px;margin-bottom:10px}
+.dim-card{border:1.5px solid var(--border-soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .18s;position:relative;min-height:88px;justify-content:center;background:#fff}
+.dim-card:hover{border-color:var(--pink);box-shadow:0 4px 12px rgba(231,0,80,.1);transform:translateY(-1px)}
+.dim-card svg{color:var(--dark)}
+.dim-card .vc-del{position:absolute;top:3px;right:5px;background:none;border:none;color:var(--pink);font-size:15px;font-weight:700;cursor:pointer;opacity:0;transition:opacity .15s;line-height:1}
+.dim-card:hover .vc-del{opacity:1}
+.dim-label{font-family:var(--font-display);font-size:10px;font-weight:700;text-align:center;margin-top:3px;color:var(--text-primary)}
+
+/* Finish / cut illustrations */
+.illust-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px;margin-bottom:10px}
+.illust-card{border:1.5px solid var(--border-soft);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .18s;position:relative;min-height:96px;justify-content:center;background:#fff}
+.illust-card:hover{border-color:var(--purple);box-shadow:0 4px 12px rgba(101,47,125,.12);transform:translateY(-1px)}
+.illust-card svg{width:56px;height:56px;flex-shrink:0;color:var(--dark)}
+.illust-card .vc-name{font-family:var(--font-display);font-size:10px;font-weight:700;text-align:center;line-height:1.25;word-break:break-word;max-width:95px;color:var(--text-primary)}
+.illust-card .vc-del{position:absolute;top:3px;right:5px;background:none;border:none;color:var(--pink);font-size:15px;font-weight:700;cursor:pointer;opacity:0;transition:opacity .15s;line-height:1}
+.illust-card:hover .vc-del{opacity:1}
+
+/* Text cards */
+.text-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:8px;margin-bottom:10px}
+.text-card{border:1.5px solid var(--border-soft);border-radius:10px;padding:10px 6px;text-align:center;font-family:var(--font-display);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;position:relative;background:#fff;color:var(--text-primary)}
+.text-card:hover{border-color:var(--dark);background:var(--cream)}
+.text-card .vc-del{position:absolute;top:2px;right:4px;background:none;border:none;color:var(--pink);font-size:13px;font-weight:700;cursor:pointer;opacity:0;transition:opacity .15s;line-height:1}
+.text-card:hover .vc-del{opacity:1}
+
+/* Add option row */
+.admin-add-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.admin-add-row input{flex:1;min-width:110px;font-size:12px;padding:7px 10px;border:1.5px solid var(--border-soft);border-radius:8px;font-family:var(--font-display)}
+.admin-add-row input:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 2px rgba(231,0,80,.1)}
+.admin-add-row button{background:var(--dark);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:11px;cursor:pointer;font-family:var(--font-ui);font-weight:600;white-space:nowrap;transition:background .15s}
+.admin-add-row button:hover{background:var(--pink)}
+
+.admin-add-step{margin-top:10px}
+.admin-add-step button{background:#fff;border:1.5px solid var(--dark);border-radius:10px;padding:8px 18px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;font-family:var(--font-ui);color:var(--dark);transition:all .15s}
+.admin-add-step button:hover{background:var(--dark);color:#fff}
+.admin-io{display:flex;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-soft);flex-wrap:wrap}
+.admin-io button{background:#fff;border:1px solid var(--border-mid);border-radius:8px;padding:6px 12px;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;font-family:var(--font-ui);color:var(--text-secondary);transition:all .15s}
+.admin-io button:hover{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+/* Profiles bar */
+.profiles-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border:1.5px solid var(--border-soft);border-radius:12px;margin-bottom:18px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(32,43,56,.03)}
+.profiles-bar select{width:auto;min-width:180px;padding:8px 32px 8px 12px;font-size:12px;font-weight:700;border-radius:8px}
+.profiles-bar .pf-label{font-family:var(--font-ui);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-secondary)}
+.profiles-bar button{background:#fff;border:1.5px solid var(--border-mid);border-radius:8px;padding:7px 13px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;color:var(--dark);transition:all .15s}
+.profiles-bar button:hover{background:var(--dark);color:#fff;border-color:var(--dark)}
+.profiles-bar button.pf-del{color:var(--pink);border-color:var(--pink)}
+.profiles-bar button.pf-del:hover{background:var(--pink);color:#fff}
+.profiles-bar .pf-badge{font-family:var(--font-ui);font-size:9px;background:var(--orange);border-radius:4px;padding:3px 8px;color:#fff;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+
+/* Edit modal */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(32,43,56,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:#fff;border-radius:16px;padding:24px;min-width:340px;max-width:460px;width:90%;box-shadow:0 20px 60px rgba(32,43,56,.3);border:1px solid var(--border-soft)}
+.modal-box h3{font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:16px;color:var(--text-primary)}
+.modal-box .fg{margin-bottom:12px}
+.modal-box .fl{font-family:var(--font-ui);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-secondary);margin-bottom:5px}
+.modal-box input{width:100%;padding:9px 12px;font-size:13px;border:1.5px solid var(--border-line);border-radius:10px;font-family:var(--font-display)}
+.modal-box input:focus{outline:none;border-color:var(--pink);box-shadow:0 0 0 3px rgba(231,0,80,.1)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.modal-btns button{padding:9px 18px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:10px;cursor:pointer;font-family:var(--font-ui);transition:all .15s}
+.modal-btns .btn-save{background:var(--pink);color:#fff;border:none}
+.modal-btns .btn-save:hover{background:var(--purple)}
+.modal-btns .btn-cancel{background:#fff;border:1.5px solid var(--border-mid);color:var(--text-secondary)}
+.modal-btns .btn-cancel:hover{background:var(--cream);color:var(--dark);border-color:var(--dark)}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .panel-col{position:static;max-height:none}
+}
+
+@media(max-width:860px){.layout{grid-template-columns:1fr}.panel-col{position:static;max-height:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top-bar">
+    <div><h1>CISMIND Configurator</h1><p class="subtitle">Configureaza comanda ta pas cu pas</p></div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeAdmin">Admin</button>
+      <button class="mode-btn" id="modeClient">Client</button>
+    </div>
+  </div>
+  <div id="profilesBar"></div>
+  <div class="layout">
+    <div class="form-col" id="formCol"></div>
+    <div class="panel-col" id="panelCol"></div>
+  </div>
+</div>
+<div id="modalRoot"></div>
+<script>
+// ── Default Data ──
+const DEFAULT_DATA = {
+  "Stikere & Etichete": {
+    steps: [
+      { label: "Tip produs", options: [
+        {name:"Sticker patrat"},{name:"Sticker cerc"},{name:"Sticker forma atipica (die-cut)"},
+        {name:"Sticker oval"},{name:"Sticker dreptunghi"},{name:"Sticker colturi rotunjite"},
+        {name:"Sticker transparent"},{name:"Sticker removable"},{name:"Sticker electrostatic"},
+        {name:"Sticker in coala"},
+        {name:"Eticheta hartie"},{name:"Eticheta adeziva dreptunghiulara"},
+        {name:"Eticheta decupata forma (in coala)"},{name:"Eticheta decupata individual"}
+      ]},
+      { label: "Material", options: [
+        {name:"PVC alb lucios (PoliPrint 800, 80\u00b5m)",url:"https://verla.ro/poliprint-800---adeziv-permanent"},
+        {name:"PVC alb mat (PoliPrint 805, 80\u00b5m)",url:"https://verla.ro/poliprint-800---adeziv-permanent"},
+        {name:"PVC polimeric lucios (PoliPrint 1010, 5-7 ani)",url:"https://verla.ro/poliprint-1000"},
+        {name:"PVC transparent lucios (DigiPrint Premium)",url:"https://verla.ro/digiprint-premium"},
+        {name:"PVC ultra-transparent (iD5 Opticlear)",url:"https://verla.ro/folii-adezive/print"},
+        {name:"PVC removable (PoliPrint 900)",url:"https://verla.ro/poliprint-900---adeziv-removabil"},
+        {name:"Folie electrostatica (fara adeziv)",note:"Disponibil Verla/PIN.ro"},
+        {name:"Hartie autoadeziva"}
+      ]},
+      { label: "Dimensiune", options: [
+        {name:"3x3 cm"},{name:"5x5 cm"},{name:"7x7 cm"},{name:"10x10 cm"},{name:"15x15 cm"},
+        {name:"A6"},{name:"A5"},{name:"A4"},{name:"Dimensiune personalizata (max latime 130cm)"}
+      ]},
+      { label: "Finisaj print", options: [
+        {name:"Fara finisaj extra"},{name:"Gloss (lac lucios peste print)"},{name:"White (lac alb \u2014 efect opac pe transparent)"}
+      ]},
+      { label: "Taiere", options: [
+        {name:"Taiere dreapta"},{name:"Kiss-cut (taiere pe contur, ramane pe backing)"},
+        {name:"Die-cut (taiere completa pe forma)",note:"Procesare Summa"},
+        {name:"Decupate individual",note:"Procesare Summa"},
+        {name:"In coala"},{name:"In rola"}
+      ]}
+    ]
+  },
+  "Format Mare \u2014 Adezive": {
+    steps: [
+      { label: "Tip produs", options: [
+        {name:"Autocolant PVC (lucios/mat)"},{name:"Autocolant PVC ORACAL 651"},
+        {name:"Autocolant PVC microperforat (one-way vision)"},{name:"Autocolant PVC removable"},
+        {name:"Autocolant PVC transparent"},{name:"Autocolant PVC frosted (sablare)"},
+        {name:"Autocolant PVC (lipit din interior)"},{name:"Tapet PVC Lino cu adeziv"},
+        {name:"Backlit Film (casete luminoase)"}
+      ]},
+      { label: "Material", options: [
+        {name:"PVC alb lucios (PoliPrint 800)",url:"https://verla.ro/poliprint-800---adeziv-permanent"},
+        {name:"PVC alb mat (PoliPrint 805)",url:"https://verla.ro/poliprint-800---adeziv-permanent"},
+        {name:"PVC polimeric (PoliPrint 1010)",url:"https://verla.ro/poliprint-1000"},
+        {name:"PVC transparent (DigiPrint Premium)",url:"https://verla.ro/digiprint-premium"},
+        {name:"PVC microperforat"},{name:"PVC frosted"},{name:"PVC Lino texturat"},
+        {name:"ORACAL 651",url:"https://verla.ro/index.php?q=oracal&option=com_finder&view=search&Itemid=546"},
+        {name:"Backlit Film translucid"}
+      ]},
+      { label: "Dimensiune", options: [
+        {name:"50x70 cm"},{name:"70x100 cm"},{name:"100x130 cm"},{name:"130x200 cm"},{name:"130x300 cm"},
+        {name:"Dimensiune personalizata (max latime 130cm)"}
+      ]},
+      { label: "Finisaj print", options: [
+        {name:"Fara finisaj extra"},{name:"Gloss (lac lucios)"},{name:"White (lac alb)"}
+      ]}
+    ]
+  },
+  "Bannere & Afise": {
+    steps: [
+      { label: "Tip produs", options: [
+        {name:"Banner frontlit (indoor)"},{name:"Banner frontlit (outdoor)"},
+        {name:"Mesh indoor"},{name:"Mesh outdoor"},{name:"Blockout Film PVC"},{name:"Backlit Film"},
+        {name:"Afis whiteback"},{name:"Afis premium art"},{name:"Afis economic KIP"},{name:"Plansa de arhitectura"}
+      ]},
+      { label: "Material", options: [
+        {name:"Banner PVC 440g"},{name:"Banner PVC 510g"},{name:"Mesh PVC"},{name:"Blockout PVC"},
+        {name:"Backlit Film"},{name:"Hartie whiteback"},{name:"Hartie foto"},{name:"Hartie KIP 80g"}
+      ]},
+      { label: "Dimensiune", options: [
+        {name:"85x200 cm (roll-up)"},{name:"100x200 cm"},{name:"200x100 cm"},{name:"300x150 cm"},
+        {name:"A2"},{name:"A1"},{name:"A0"},{name:"Dimensiune personalizata"}
+      ]},
+      { label: "Finisare", options: [
+        {name:"Fara"},{name:"Tiv + ocheti"},{name:"Buzunare tije"},{name:"Ochi metalici"}
+      ]}
+    ]
+  },
+  "Canvas & Decor": {
+    steps: [
+      { label: "Tip produs", options: [
+        {name:"Tablou canvas standard"},{name:"Tablou canvas custom"},
+        {name:"Perna personalizata 40x40"},{name:"Patura personalizata"},{name:"Decor textil perete"}
+      ]},
+      { label: "Material", options: [
+        {name:"Canvas Matisse lucios (poliester 270g)",url:"https://verla.ro/canvas-banner-matisse-canvas-poliester-270-g/mp.html"},
+        {name:"Canvas Matisse M mat (poliester 270g)",url:"https://verla.ro/canvas-banner-matisse-m-canvas-poliester-mat-270-g/mp.html"},
+        {name:"Canvas Rubens Fine Art (bumbac 290g)",url:"https://verla.ro/fineart-canvas-rubens-canvas-bumbac-290-g/mp.html"},
+        {name:"Textil sublimare"},{name:"Polar / microfibra"}
+      ]},
+      { label: "Dimensiune", options: [
+        {name:"20x30 cm"},{name:"30x40 cm"},{name:"40x60 cm"},{name:"60x90 cm"},{name:"80x120 cm"},
+        {name:"Dimensiune personalizata (max latime 127cm)"}
+      ]},
+      { label: "Sasiu", options: [{name:"Sasiu lemn 2cm"},{name:"Sasiu lemn 4cm"},{name:"Fara sasiu"}] }
+    ]
+  },
+  "Personalizare DTF": {
+    steps: [
+      { label: "Tip comanda", options: [
+        {name:"Transfer DTF pe articol"},{name:"Transfer DTF pe fasie/rola (la metru)"},{name:"Transfer DTF pe coala"}
+      ]},
+      { label: "Dimensiune transfer", options: [
+        {name:"10x10 cm"},{name:"15x15 cm"},{name:"20x20 cm"},{name:"25x30 cm"},{name:"30x40 cm"},
+        {name:"40x50 cm"},{name:"50x60 cm"},{name:"A5 (14.8x21 cm)"},{name:"A4 (21x29.7 cm)"},{name:"A3 (29.7x42 cm)"},
+        {name:"La metru (latime 60cm)"},{name:"Dimensiune personalizata (max latime 60cm)"}
+      ]},
+      { label: "Articol", options: [
+        {name:"Tricou"},{name:"Polo"},{name:"Hanorac"},{name:"Maieu"},{name:"Sacosa textila"},{name:"Caciula / Sapca"}
+      ]},
+      { label: "Culoare articol", options: [
+        {name:"Alb"},{name:"Negru"},{name:"Gri"},{name:"Navy"},{name:"Rosu"},{name:"Alta culoare"}
+      ]},
+      { label: "Marime", options: [
+        {name:"XXS"},{name:"XS"},{name:"S"},{name:"M"},{name:"L"},{name:"XL"},{name:"XXL"},
+        {name:"3XL"},{name:"4XL"},{name:"5XL"},{name:"Mix marimi"}
+      ]}
+    ]
+  },
+  "Print Digital (OKI)": {
+    steps: [
+      { label: "Tip produs", options: [
+        {name:"Carti de vizita"},{name:"Flyere / Fluturasi"},{name:"Pliante (cu pliere)"},
+        {name:"Brosuri capsate"},{name:"Postere (max A3)"},{name:"Meniuri"},
+        {name:"Invitatii"},{name:"Diplome / Certificate"},{name:"Banner OKI (max 297x1321mm)"}
+      ]},
+      { label: "Dimensiune", options: [], dynamic: "printDims" },
+      { label: "Tip hartie", options: [
+        {name:"Hartie offset 80-90g"},{name:"Hartie lucioasa (glossy) 130g"},
+        {name:"Hartie lucioasa (glossy) 200g"},{name:"Hartie mata 200g"},
+        {name:"Carton mat 250g"},{name:"Carton lucios 250g"},
+        {name:"Hartie kraft"},{name:"Hartie reciclata"}
+      ]},
+      { label: "Finisaj", options: [
+        {name:"Fara finisaj"},{name:"Colturi rotunjite"},
+        {name:"Pliere (1 fald)"},{name:"Pliere (2 falduri \u2014 Z sau C)"},
+        {name:"Laminare la rece"}
+      ]},
+      { label: "Fata / verso", options: [{name:"O fata"},{name:"Fata-verso (duplex automat)"}] }
+    ],
+    dimsByProduct: {
+      "Carti de vizita": [{name:"90x50 mm (standard RO)"},{name:"85x55 mm (international)"},{name:"Dimensiune custom"}],
+      "Flyere / Fluturasi": [{name:"A6 (105x148mm)"},{name:"A5 (148x210mm)"},{name:"A4 (210x297mm)"},{name:"DL (99x210mm, 1/3 A4)"}],
+      "Pliante (cu pliere)": [{name:"A5 (pliat din A4)"},{name:"A4 (pliat din A3)"},{name:"DL (pliat din A4)"}],
+      "Brosuri capsate": [{name:"A5 (capsata)"},{name:"A4 (capsata)"}],
+      "Postere (max A3)": [{name:"A4 (210x297mm)"},{name:"A3 (297x420mm)"}],
+      "Meniuri": [{name:"DL"},{name:"A5"},{name:"A4"},{name:"A4 pliat"}],
+      "Invitatii": [{name:"10x15 cm"},{name:"14x14 cm"},{name:"A6"},{name:"DL"},{name:"Dimensiune custom"}],
+      "Diplome / Certificate": [{name:"A4"},{name:"A3"}],
+      "Banner OKI (max 297x1321mm)": [{name:"297x600 mm"},{name:"297x900 mm"},{name:"297x1200 mm"},{name:"Dimensiune custom (max 297x1321mm)"}]
+    }
+  },
+  "Gravura Laser": {
+    steps: [
+      { label: "Material de gravat", options: [{name:"Lemn"},{name:"Metal"},{name:"Acril"},{name:"Sticla"},{name:"Piele"}] },
+      { label: "Tip produs", options: [{name:"Breloc"},{name:"Placheta"},{name:"Coastere"},{name:"Cutie personalizata"},{name:"Obiect decorativ"}] },
+      { label: "Dimensiune", options: [{name:"Mic (sub 10cm)"},{name:"Mediu (10-20cm)"},{name:"Mare (peste 20cm)"}] }
+    ]
+  }
+};
+
+const DESIGN_OPTIONS = ["Design logo","Identitate vizuala / Branding","Layout pentru print","Pregatire fisiere pentru tipar","Redactare grafica completa"];
+const PROFILES_KEY = "cismind_profiles";
+
+// ── Profiles System ──
+function loadProfiles() {
+  try {
+    const s = localStorage.getItem(PROFILES_KEY);
+    if (s) {
+      const p = JSON.parse(s);
+      // Ensure Default always exists with latest DEFAULT_DATA
+      if (!p.profiles["Default"]) p.profiles["Default"] = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      return p;
+    }
+  } catch(e) {}
+  return { active: "Default", profiles: { "Default": JSON.parse(JSON.stringify(DEFAULT_DATA)) } };
+}
+function saveProfiles() { localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles)); }
+function getActiveData() { return profiles.profiles[profiles.active]; }
+
+// Migrate old single-profile data if exists
+(function migrateOldData() {
+  try {
+    const old = localStorage.getItem("cismind_configurator_data");
+    if (old && !localStorage.getItem(PROFILES_KEY)) {
+      const oldData = JSON.parse(old);
+      const migrated = { active: "Migrat", profiles: { "Default": JSON.parse(JSON.stringify(DEFAULT_DATA)), "Migrat": oldData } };
+      localStorage.setItem(PROFILES_KEY, JSON.stringify(migrated));
+      localStorage.removeItem("cismind_configurator_data");
+    }
+  } catch(e) {}
+})();
+
+let profiles = loadProfiles();
+let data = getActiveData();
+let mode = "admin";
+let state = { category:"", selections:{}, quantity:100, details:"", contact:{name:"",email:"",phone:""}, designAddon:false, designService:"" };
+let openSteps = {};
+
+// Compatibility wrappers
+function saveData() { profiles.profiles[profiles.active] = data; saveProfiles(); }
+const categories = () => Object.keys(data);
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function switchProfile(name) {
+  if (!profiles.profiles[name]) return;
+  profiles.active = name;
+  data = getActiveData();
+  state = { category:"", selections:{}, quantity:100, details:"", contact:{name:"",email:"",phone:""}, designAddon:false, designService:"" };
+  openSteps = {};
+  saveProfiles();
+  renderProfilesBar();
+  renderForm();
+  renderPanel();
+}
+
+function createProfile(name, sourceData) {
+  if (!name || profiles.profiles[name]) return false;
+  profiles.profiles[name] = JSON.parse(JSON.stringify(sourceData || DEFAULT_DATA));
+  profiles.active = name;
+  data = getActiveData();
+  saveProfiles();
+  return true;
+}
+
+function deleteProfile(name) {
+  if (name === "Default" || !profiles.profiles[name]) return;
+  delete profiles.profiles[name];
+  if (profiles.active === name) {
+    profiles.active = "Default";
+    data = getActiveData();
+  }
+  saveProfiles();
+}
+
+function renameProfile(oldName, newName) {
+  if (oldName === "Default" || !newName || profiles.profiles[newName] || !profiles.profiles[oldName]) return false;
+  profiles.profiles[newName] = profiles.profiles[oldName];
+  delete profiles.profiles[oldName];
+  if (profiles.active === oldName) profiles.active = newName;
+  saveProfiles();
+  return true;
+}
+
+// ═══════════════════════════════════════
+// SVG ICON GENERATORS
+// ═══════════════════════════════════════
+
+function svgProductIcon(name) {
+  const n = name.toLowerCase();
+  // Sticker types
+  if (n.includes('sticker patrat') || n.includes('sticker dreptunghi') || n.includes('colturi rotunjite'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M8 34l6-6" stroke-dasharray="2 2" opacity=".4"/></svg>`;
+  if (n.includes('sticker cerc'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><circle cx="24" cy="24" r="16"/></svg>`;
+  if (n.includes('die-cut') || n.includes('forma atipica'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M24 6l5.5 11 12.1 1.8-8.8 8.5 2.1 12.1L24 33.5l-10.9 5.9 2.1-12.1-8.8-8.5 12.1-1.8z"/></svg>`;
+  if (n.includes('sticker oval'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><ellipse cx="24" cy="24" rx="18" ry="13"/></svg>`;
+  if (n.includes('sticker transparent'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="2" stroke-dasharray="3 2"/></svg>`;
+  if (n.includes('sticker removable'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M18 30l4-12h4l4 12" opacity=".4"/><line x1="19" y1="26" x2="29" y2="26" opacity=".4"/></svg>`;
+  if (n.includes('sticker electrostatic'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M22 14v8l4-4v10" stroke-width="1.5" opacity=".5"/></svg>`;
+  if (n.includes('sticker in coala'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="6" width="36" height="36" rx="2"/><rect x="10" y="10" width="11" height="11" rx="2"/><rect x="27" y="10" width="11" height="11" rx="2"/><rect x="10" y="27" width="11" height="11" rx="2"/><rect x="27" y="27" width="11" height="11" rx="2"/></svg>`;
+  // Eticheta types
+  if (n.includes('eticheta'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="10" width="36" height="28" rx="3"/><line x1="12" y1="18" x2="36" y2="18" opacity=".4"/><line x1="12" y1="23" x2="30" y2="23" opacity=".4"/><line x1="12" y1="28" x2="33" y2="28" opacity=".4"/></svg>`;
+  // Autocolant types
+  if (n.includes('autocolant') || n.includes('tapet') || n.includes('backlit film'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="6" width="36" height="36" rx="2"/><path d="M6 30c8-2 14 4 22 0s10-6 14-4" opacity=".3"/></svg>`;
+  if (n.includes('microperforat') || n.includes('one-way'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="6" width="36" height="36" rx="2"/><circle cx="16" cy="16" r="1.5" fill="#111" opacity=".3"/><circle cx="24" cy="16" r="1.5" fill="#111" opacity=".3"/><circle cx="32" cy="16" r="1.5" fill="#111" opacity=".3"/><circle cx="16" cy="24" r="1.5" fill="#111" opacity=".3"/><circle cx="24" cy="24" r="1.5" fill="#111" opacity=".3"/><circle cx="32" cy="24" r="1.5" fill="#111" opacity=".3"/><circle cx="16" cy="32" r="1.5" fill="#111" opacity=".3"/><circle cx="24" cy="32" r="1.5" fill="#111" opacity=".3"/><circle cx="32" cy="32" r="1.5" fill="#111" opacity=".3"/></svg>`;
+  // Banner types
+  if (n.includes('banner') || n.includes('mesh') || n.includes('blockout'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="10" y="4" width="28" height="36" rx="1"/><line x1="10" y1="4" x2="10" y2="44"/><line x1="38" y1="4" x2="38" y2="44"/><circle cx="10" cy="44" r="2"/><circle cx="38" cy="44" r="2"/></svg>`;
+  // Afis / poster types
+  if (n.includes('afis') || n.includes('plansa') || n.includes('poster'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="4" width="32" height="40" rx="1"/><line x1="14" y1="12" x2="34" y2="12" opacity=".3"/><line x1="14" y1="18" x2="34" y2="18" opacity=".3"/><rect x="14" y="22" width="20" height="14" rx="1" opacity=".3"/></svg>`;
+  // Canvas / tablou
+  if (n.includes('canvas') || n.includes('tablou'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="6" width="36" height="36" rx="1"/><rect x="9" y="9" width="30" height="30" rx="1" stroke-dasharray="2 2" opacity=".4"/><path d="M12 34l8-10 6 7 4-4 8 7" opacity=".3"/></svg>`;
+  // Perna
+  if (n.includes('perna'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M8 14c0-2 2-4 6-5s12-1 20 0 8 3 8 5v20c0 2-2 4-8 5s-14 1-20 0-6-3-6-5z"/></svg>`;
+  // Patura
+  if (n.includes('patura'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="8" width="36" height="32" rx="3"/><path d="M6 14c6 0 6 4 12 4s6-4 12-4 6 4 12 4" opacity=".3"/></svg>`;
+  // Decor textil
+  if (n.includes('decor textil'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="10" width="32" height="28" rx="2"/><line x1="24" y1="6" x2="24" y2="10"/><circle cx="24" cy="5" r="2"/></svg>`;
+  // Tricou
+  if (n.includes('tricou'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M16 8l-10 6 4 6 6-3v25h16V17l6 3 4-6-10-6c0 3-3 6-8 6s-8-3-8-6z"/></svg>`;
+  // Polo
+  if (n.includes('polo'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M16 8l-10 6 4 6 6-3v25h16V17l6 3 4-6-10-6c0 3-3 6-8 6s-8-3-8-6z"/><path d="M21 8v6h6V8" opacity=".5"/></svg>`;
+  // Hanorac
+  if (n.includes('hanorac'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M16 8l-10 6 4 6 6-3v25h16V17l6 3 4-6-10-6c0 3-3 6-8 6s-8-3-8-6z"/><path d="M20 20c0 0 2 6 4 6s4-6 4-6" opacity=".4"/><rect x="18" y="30" width="12" height="6" rx="1" opacity=".3"/></svg>`;
+  // Maieu
+  if (n.includes('maieu'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M16 8c0 3 3 6 8 6s8-3 8-6v0l2 2v32H14V10l2-2z"/></svg>`;
+  // Sacosa
+  if (n.includes('sacosa'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="10" y="16" width="28" height="26" rx="2"/><path d="M18 16v-4a6 6 0 0112 0v4"/></svg>`;
+  // Caciula / Sapca
+  if (n.includes('caciula') || n.includes('sapca'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><ellipse cx="24" cy="28" rx="16" ry="6"/><path d="M8 28c0-12 7-20 16-20s16 8 16 20"/><line x1="6" y1="32" x2="14" y2="34" stroke-width="1.5"/></svg>`;
+  // Flyere
+  if (n.includes('flyer') || n.includes('fluturasi'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="6" width="32" height="36" rx="2"/><line x1="14" y1="14" x2="34" y2="14" opacity=".3"/><line x1="14" y1="19" x2="30" y2="19" opacity=".3"/><line x1="14" y1="24" x2="32" y2="24" opacity=".3"/></svg>`;
+  // Carti de vizita
+  if (n.includes('carti de vizita'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="4" y="12" width="40" height="24" rx="3"/><line x1="10" y1="20" x2="24" y2="20" opacity=".4"/><line x1="10" y1="25" x2="20" y2="25" opacity=".3"/><line x1="10" y1="30" x2="22" y2="30" opacity=".3"/></svg>`;
+  // Brosuri
+  if (n.includes('brosur') || n.includes('pliant'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M8 6h14v36H8z"/><path d="M22 6h14v36H22z"/><path d="M36 6h4l-4 36z" opacity=".3"/></svg>`;
+  // Meniuri
+  if (n.includes('meniu'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="10" y="4" width="28" height="40" rx="2"/><line x1="16" y1="12" x2="32" y2="12" opacity=".4"/><line x1="16" y1="18" x2="28" y2="18" opacity=".3"/><line x1="16" y1="24" x2="30" y2="24" opacity=".3"/><line x1="16" y1="30" x2="26" y2="30" opacity=".3"/><line x1="16" y1="36" x2="28" y2="36" opacity=".3"/></svg>`;
+  // Cataloage
+  if (n.includes('catalog'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="10" y="6" width="28" height="36" rx="2"/><line x1="24" y1="6" x2="24" y2="42"/><rect x="12" y="10" width="10" height="8" rx="1" opacity=".3"/></svg>`;
+  // Invitatii
+  if (n.includes('invitat'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="12" width="36" height="24" rx="2"/><path d="M6 14l18 12 18-12"/></svg>`;
+  // Diplome / Certificate
+  if (n.includes('diplom') || n.includes('certificat'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="6" width="36" height="30" rx="2"/><line x1="14" y1="14" x2="34" y2="14" opacity=".3"/><line x1="18" y1="20" x2="30" y2="20" opacity=".3"/><circle cx="24" cy="28" r="4" opacity=".4"/></svg>`;
+  // Breloc
+  if (n.includes('breloc'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><circle cx="24" cy="28" r="12"/><circle cx="24" cy="12" r="4"/><line x1="24" y1="16" x2="24" y2="16"/></svg>`;
+  // Placheta
+  if (n.includes('placheta'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="10" width="32" height="22" rx="3"/><line x1="14" y1="18" x2="34" y2="18" opacity=".3"/><line x1="14" y1="24" x2="28" y2="24" opacity=".3"/></svg>`;
+  // Coastere
+  if (n.includes('coaster'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="12" stroke-dasharray="2 2" opacity=".4"/></svg>`;
+  // Cutie
+  if (n.includes('cutie'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M8 18l16-8 16 8v18l-16 8-16-8z"/><path d="M8 18l16 8 16-8"/><line x1="24" y1="26" x2="24" y2="44"/></svg>`;
+  // Obiect decorativ
+  if (n.includes('obiect decorativ'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M24 6l4 12h12l-10 7 4 12-10-7-10 7 4-12-10-7h12z"/></svg>`;
+  // Transfer DTF
+  if (n.includes('transfer dtf'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M16 24h16M24 16v16" opacity=".3" stroke-width="1.5"/></svg>`;
+  // Lemn
+  if (n.includes('lemn'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M8 16h32M8 24h32M8 32h32" opacity=".25"/></svg>`;
+  // Metal
+  if (n.includes('metal'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M14 14l20 20M34 14l-20 20" opacity=".2"/></svg>`;
+  // Acril
+  if (n.includes('acril'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="2" stroke-dasharray="3 2" opacity=".6"/><rect x="12" y="12" width="24" height="24" rx="1"/></svg>`;
+  // Sticla
+  if (n.includes('sticla'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><path d="M16 6h16v8l4 24c0 2-4 4-12 4s-12-2-12-4l4-24z"/></svg>`;
+  // Piele
+  if (n.includes('piele'))
+    return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M12 16c4 0 4 2 8 2s4-2 8-2 4 2 8 2" opacity=".3"/><path d="M12 24c4 0 4 2 8 2s4-2 8-2 4 2 8 2" opacity=".3"/><path d="M12 32c4 0 4 2 8 2s4-2 8-2 4 2 8 2" opacity=".3"/></svg>`;
+  // Generic fallback
+  return `<svg viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="32" height="32" rx="4"/><circle cx="24" cy="24" r="6" opacity=".3"/></svg>`;
+}
+
+// ── Dimension diagram SVG ──
+function svgDimensionDiagram(name) {
+  const n = name.toLowerCase();
+  let w = 40, h = 40, label = name;
+  // Parse dimensions
+  const cmMatch = n.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*cm/);
+  const mmMatch = n.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*mm/);
+  const aMatch = n.match(/^a(\d)$/);
+  const aDimMatch = n.match(/a(\d)\s*\(/);
+  const dlMatch = n.match(/^dl\b/);
+
+  const scale = 1.2; // px per cm
+  const maxH = 100;
+  const minSize = 14;
+
+  if (cmMatch) {
+    w = Math.max(minSize, Math.min(maxH, parseFloat(cmMatch[1]) * scale));
+    h = Math.max(minSize, Math.min(maxH, parseFloat(cmMatch[2]) * scale));
+    label = cmMatch[1] + 'x' + cmMatch[2] + ' cm';
+  } else if (mmMatch) {
+    w = Math.max(minSize, Math.min(maxH, parseFloat(mmMatch[1]) * scale / 10));
+    h = Math.max(minSize, Math.min(maxH, parseFloat(mmMatch[2]) * scale / 10));
+    label = mmMatch[1] + 'x' + mmMatch[2] + ' mm';
+  } else if (aDimMatch || aMatch) {
+    const aNum = parseInt(aDimMatch ? aDimMatch[1] : aMatch[1]);
+    // A-series approximate cm dimensions
+    const aSizes = {0:[84.1,118.9],1:[59.4,84.1],2:[42,59.4],3:[29.7,42],4:[21,29.7],5:[14.8,21],6:[10.5,14.8]};
+    const sz = aSizes[aNum] || [21,29.7];
+    w = Math.max(minSize, Math.min(maxH, sz[0] * scale));
+    h = Math.max(minSize, Math.min(maxH, sz[1] * scale));
+  } else if (dlMatch) {
+    w = Math.max(minSize, 9.9 * scale);
+    h = Math.max(minSize, Math.min(maxH, 21 * scale));
+  } else if (n.includes('personalizat') || n.includes('la metru')) {
+    // Custom dimension - show dashed
+    return `<svg viewBox="0 0 80 60" width="80" height="60" fill="none" stroke="#111" stroke-width="1"><rect x="10" y="8" width="60" height="40" rx="1" stroke-dasharray="3 2"/><text x="40" y="32" text-anchor="middle" font-size="7" fill="#888" stroke="none" font-family="sans-serif">Custom</text></svg>`;
+  } else if (n.includes('mic')) {
+    w = 14; h = 14;
+  } else if (n.includes('mediu')) {
+    w = 24; h = 24;
+  } else if (n.includes('mare') || n.includes('peste')) {
+    w = 40; h = 40;
+  }
+
+  // SVG with dimension lines
+  const svgW = w + 40;
+  const svgH = h + 36;
+  const rx = 10;
+  const ry = 12;
+
+  return `<svg viewBox="0 0 ${svgW} ${svgH}" width="${Math.max(60, svgW)}" height="${Math.max(50, svgH)}" fill="none" stroke="#111" stroke-width="1">
+    <rect x="${rx}" y="${ry}" width="${w}" height="${h}" rx="1"/>
+    <!-- width arrow -->
+    <line x1="${rx}" y1="${ry+h+6}" x2="${rx+w}" y2="${ry+h+6}" stroke-width=".7"/>
+    <line x1="${rx}" y1="${ry+h+3}" x2="${rx}" y2="${ry+h+9}" stroke-width=".7"/>
+    <line x1="${rx+w}" y1="${ry+h+3}" x2="${rx+w}" y2="${ry+h+9}" stroke-width=".7"/>
+    <polygon points="${rx},${ry+h+6} ${rx+3},${ry+h+4.5} ${rx+3},${ry+h+7.5}" fill="#111"/>
+    <polygon points="${rx+w},${ry+h+6} ${rx+w-3},${ry+h+4.5} ${rx+w-3},${ry+h+7.5}" fill="#111"/>
+    <!-- height arrow -->
+    <line x1="${rx+w+6}" y1="${ry}" x2="${rx+w+6}" y2="${ry+h}" stroke-width=".7"/>
+    <line x1="${rx+w+3}" y1="${ry}" x2="${rx+w+9}" y2="${ry}" stroke-width=".7"/>
+    <line x1="${rx+w+3}" y1="${ry+h}" x2="${rx+w+9}" y2="${ry+h}" stroke-width=".7"/>
+    <polygon points="${rx+w+6},${ry} ${rx+w+4.5},${ry+3} ${rx+w+7.5},${ry+3}" fill="#111"/>
+    <polygon points="${rx+w+6},${ry+h} ${rx+w+4.5},${ry+h-3} ${rx+w+7.5},${ry+h-3}" fill="#111"/>
+  </svg>`;
+}
+
+// ── Finish illustration SVG ──
+function svgFinishIllust(name) {
+  const n = name.toLowerCase();
+  if (n.includes('fara'))
+    return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><circle cx="28" cy="28" r="20" fill="#eee"/></svg>`;
+  if (n.includes('gloss'))
+    return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><circle cx="28" cy="28" r="20" fill="#f5f5f5"/><line x1="18" y1="18" x2="22" y2="14" opacity=".4"/><line x1="22" y1="22" x2="26" y2="18" opacity=".35"/><line x1="26" y1="26" x2="30" y2="22" opacity=".3"/><line x1="30" y1="30" x2="34" y2="26" opacity=".25"/><line x1="34" y1="34" x2="38" y2="30" opacity=".2"/></svg>`;
+  if (n.includes('white'))
+    return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><circle cx="28" cy="30" r="18" fill="#ddd" opacity=".5"/><circle cx="28" cy="26" r="18" fill="#fff" stroke="#111"/><text x="28" y="29" text-anchor="middle" font-size="7" fill="#888" stroke="none" font-family="sans-serif">W</text></svg>`;
+  // fallback
+  return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><circle cx="28" cy="28" r="20"/></svg>`;
+}
+
+// ── Cut / Finisare illustration SVG ──
+function svgCutIllust(name) {
+  const n = name.toLowerCase();
+  if (n.includes('taiere dreapta'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="44" height="40" rx="1"/><line x1="30" y1="4" x2="30" y2="52" stroke-dasharray="3 2" stroke="#c00" stroke-width="1"/></svg>`;
+  if (n.includes('kiss-cut'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="6" width="48" height="44" rx="2" fill="#f8f8f8"/><circle cx="30" cy="28" r="14" stroke-dasharray="2.5 1.5" stroke="#c00" stroke-width="1"/><circle cx="30" cy="28" r="14" fill="#fff" stroke="#111" stroke-width="1"/></svg>`;
+  if (n.includes('die-cut') && !n.includes('taiere'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><path d="M30 8l7 14h14l-11 9 4 14-14-9-14 9 4-14-11-9h14z" fill="#fff"/></svg>`;
+  if (n.includes('decupate individual'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><circle cx="18" cy="20" r="8" fill="#fff"/><rect x="34" y="12" width="16" height="16" rx="2" fill="#fff"/><path d="M18 38l6 10h-12z" fill="#fff"/></svg>`;
+  if (n.includes('in coala'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="6" y="4" width="48" height="48" rx="2" fill="#f8f8f8"/><circle cx="18" cy="16" r="6"/><circle cx="34" cy="16" r="6"/><circle cx="18" cy="32" r="6"/><circle cx="34" cy="32" r="6"/><circle cx="50" cy="16" r="6" opacity=".3"/><circle cx="50" cy="32" r="6" opacity=".3"/></svg>`;
+  if (n.includes('in rola'))
+    return `<svg viewBox="0 0 70 44" fill="none" stroke="#111" stroke-width="1.2"><rect x="4" y="10" width="62" height="24" rx="12" fill="#f8f8f8"/><circle cx="16" cy="22" r="6"/><circle cx="32" cy="22" r="6"/><circle cx="48" cy="22" r="6"/><ellipse cx="4" cy="22" rx="3" ry="12" fill="#eee" stroke="#111"/></svg>`;
+  if (n.includes('tiv') && n.includes('ocheti'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="6" width="44" height="44" rx="1"/><rect x="6" y="6" width="4" height="44" fill="#eee" stroke="#111" stroke-width=".8"/><rect x="50" y="6" width="4" height="44" fill="#eee" stroke="#111" stroke-width=".8"/><circle cx="8" cy="12" r="2.5" fill="#fff"/><circle cx="8" cy="44" r="2.5" fill="#fff"/><circle cx="52" cy="12" r="2.5" fill="#fff"/><circle cx="52" cy="44" r="2.5" fill="#fff"/></svg>`;
+  if (n.includes('buzunare tije'))
+    return `<svg viewBox="0 0 60 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="10" y="6" width="40" height="44" rx="1"/><rect x="10" y="6" width="40" height="6" fill="#eee" stroke="#111" stroke-width=".8"/><rect x="10" y="44" width="40" height="6" fill="#eee" stroke="#111" stroke-width=".8"/><line x1="8" y1="9" x2="52" y2="9" stroke-width="1.5"/><line x1="8" y1="47" x2="52" y2="47" stroke-width="1.5"/></svg>`;
+  if (n.includes('ochi metalici'))
+    return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><circle cx="28" cy="28" r="18" fill="#f0f0f0"/><circle cx="28" cy="28" r="8" fill="#fff" stroke="#111" stroke-width="1.5"/><circle cx="28" cy="28" r="5"/></svg>`;
+  if (n.includes('fara'))
+    return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="40" height="40" rx="2"/><line x1="8" y1="8" x2="48" y2="48" opacity=".2"/></svg>`;
+  // fallback
+  return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="40" height="40" rx="3"/></svg>`;
+}
+
+// ── Sasiu (frame) illustration SVG ──
+function svgSasiuIllust(name) {
+  const n = name.toLowerCase();
+  if (n.includes('2cm'))
+    return `<svg viewBox="0 0 70 56" fill="none" stroke="#111" stroke-width="1.2">
+      <rect x="10" y="8" width="50" height="40" rx="1"/>
+      <rect x="10" y="8" width="50" height="40" rx="1" fill="#f8f8f8" opacity=".3"/>
+      <!-- cross section -->
+      <rect x="10" y="38" width="50" height="4" fill="#eee" stroke="#111" stroke-width=".8"/>
+      <text x="35" y="52" text-anchor="middle" font-size="7" fill="#555" stroke="none" font-family="sans-serif">2 cm</text>
+    </svg>`;
+  if (n.includes('4cm'))
+    return `<svg viewBox="0 0 70 56" fill="none" stroke="#111" stroke-width="1.2">
+      <rect x="10" y="6" width="50" height="36" rx="1"/>
+      <rect x="10" y="6" width="50" height="36" rx="1" fill="#f8f8f8" opacity=".3"/>
+      <!-- thicker cross section -->
+      <rect x="10" y="34" width="50" height="8" fill="#eee" stroke="#111" stroke-width=".8"/>
+      <text x="35" y="52" text-anchor="middle" font-size="7" fill="#555" stroke="none" font-family="sans-serif">4 cm</text>
+    </svg>`;
+  if (n.includes('fara'))
+    return `<svg viewBox="0 0 70 56" fill="none" stroke="#111" stroke-width="1.2">
+      <rect x="10" y="10" width="50" height="36" rx="1" fill="#f8f8f8"/>
+      <text x="35" y="52" text-anchor="middle" font-size="7" fill="#888" stroke="none" font-family="sans-serif">fara sasiu</text>
+    </svg>`;
+  return `<svg viewBox="0 0 56 56" fill="none" stroke="#111" stroke-width="1.2"><rect x="8" y="8" width="40" height="40" rx="2"/></svg>`;
+}
+
+// ── Determine step type ──
+function getStepType(label, category) {
+  const l = label.toLowerCase();
+  if (l === 'material' || l.includes('material')) {
+    // Check if it's "Material de gravat" which doesn't have URLs
+    if (l === 'material de gravat') return 'text';
+    return 'material';
+  }
+  if (l.includes('tip produs') || l.includes('tip comanda') || l === 'articol') return 'product';
+  if (l.includes('dimensiune') || l.includes('marime')) {
+    if (l.includes('marime')) return 'text';
+    return 'dimension';
+  }
+  if (l.includes('finisaj print')) return 'finish';
+  if (l.includes('taiere') || l.includes('finisare')) return 'cut';
+  if (l.includes('sasiu')) return 'sasiu';
+  if (l.includes('culoare') || l.includes('fata') || l.includes('hartie')) return 'text';
+  return 'text';
+}
+
+// ═══════════════════════════════════════
+// RENDER PROFILES BAR
+// ═══════════════════════════════════════
+
+function renderProfilesBar() {
+  const el = document.getElementById("profilesBar");
+  const names = Object.keys(profiles.profiles);
+  const isDefault = profiles.active === "Default";
+
+  let h = `<div class="profiles-bar">`;
+  h += `<span class="pf-label">Profil activ:</span>`;
+  h += `<select id="pfSelect">`;
+  names.forEach(n => {
+    h += `<option value="${esc(n)}" ${profiles.active===n?'selected':''}>${esc(n)}${n==='Default'?' (read-only)':''}</option>`;
+  });
+  h += `</select>`;
+  if (isDefault) h += `<span class="pf-badge">READ-ONLY</span>`;
+  h += `<button id="pfNew">+ Nou</button>`;
+  h += `<button id="pfDuplicate">Duplica</button>`;
+  if (!isDefault) h += `<button id="pfRename">Rename</button>`;
+  if (!isDefault) h += `<button class="pf-del" id="pfDelete">Sterge</button>`;
+  h += `</div>`;
+
+  el.innerHTML = h;
+  bindProfilesBar();
+}
+
+function bindProfilesBar() {
+  const sel = document.getElementById("pfSelect");
+  if (sel) sel.addEventListener("change", () => switchProfile(sel.value));
+
+  const btnNew = document.getElementById("pfNew");
+  if (btnNew) btnNew.addEventListener("click", () => {
+    showModal("Profil nou", [
+      {key:"name", label:"Numele profilului", placeholder:"ex: Campanie vara 2026"}
+    ], vals => {
+      if (vals.name.trim()) {
+        if (profiles.profiles[vals.name.trim()]) { alert("Exista deja un profil cu acest nume!"); return; }
+        createProfile(vals.name.trim(), DEFAULT_DATA);
+        state = { category:"", selections:{}, quantity:100, details:"", contact:{name:"",email:"",phone:""}, designAddon:false, designService:"" };
+        openSteps = {};
+        renderProfilesBar(); renderForm(); renderPanel();
+      }
+    });
+  });
+
+  const btnDup = document.getElementById("pfDuplicate");
+  if (btnDup) btnDup.addEventListener("click", () => {
+    showModal("Duplica profilul: " + profiles.active, [
+      {key:"name", label:"Numele copiei", value: profiles.active + " (copie)", placeholder:"Numele noului profil"}
+    ], vals => {
+      if (vals.name.trim()) {
+        if (profiles.profiles[vals.name.trim()]) { alert("Exista deja un profil cu acest nume!"); return; }
+        createProfile(vals.name.trim(), data);
+        state = { category:"", selections:{}, quantity:100, details:"", contact:{name:"",email:"",phone:""}, designAddon:false, designService:"" };
+        openSteps = {};
+        renderProfilesBar(); renderForm(); renderPanel();
+      }
+    });
+  });
+
+  const btnRen = document.getElementById("pfRename");
+  if (btnRen) btnRen.addEventListener("click", () => {
+    showModal("Redenumeste profilul", [
+      {key:"name", label:"Nume nou", value: profiles.active}
+    ], vals => {
+      if (vals.name.trim() && renameProfile(profiles.active, vals.name.trim())) {
+        data = getActiveData();
+        renderProfilesBar(); renderForm(); renderPanel();
+      } else if (vals.name.trim()) {
+        alert("Nu se poate redenumi (numele exista deja sau e Default).");
+      }
+    });
+  });
+
+  const btnDel = document.getElementById("pfDelete");
+  if (btnDel) btnDel.addEventListener("click", () => {
+    if (confirm('Stergi profilul "' + profiles.active + '"? Nu se poate recupera.')) {
+      deleteProfile(profiles.active);
+      data = getActiveData();
+      state = { category:"", selections:{}, quantity:100, details:"", contact:{name:"",email:"",phone:""}, designAddon:false, designService:"" };
+      openSteps = {};
+      renderProfilesBar(); renderForm(); renderPanel();
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// RENDER FORM (LEFT COLUMN)
+// ═══════════════════════════════════════
+
+function renderForm() {
+  const el = document.getElementById("formCol");
+  let h = `<div class="fg"><div class="fl">Categorie</div><select id="catSelect"><option value="">\u2014 Alege categoria \u2014</option>`;
+  categories().forEach(c => { h += `<option value="${esc(c)}" ${state.category===c?'selected':''}>${esc(c)}</option>`; });
+  h += `</select></div>`;
+
+  if (state.category && data[state.category]) {
+    const cat = data[state.category];
+    cat.steps.forEach(step => {
+      // Dynamic dimensions: get options from dimsByProduct if applicable
+      let opts = step.options;
+      if (step.dynamic === "printDims" && cat.dimsByProduct) {
+        const tipProdus = state.selections["Tip produs"];
+        opts = (tipProdus && cat.dimsByProduct[tipProdus]) ? cat.dimsByProduct[tipProdus] : [];
+        if (!tipProdus) {
+          h += `<div class="fg"><div class="fl">${esc(step.label)}</div><select disabled><option>\u2014 Alege mai intai tipul de produs \u2014</option></select></div>`;
+          return;
+        }
+      }
+      h += `<div class="fg"><div class="fl">${esc(step.label)}</div><select data-step="${esc(step.label)}"><option value="">\u2014 Alege \u2014</option>`;
+      opts.forEach(o => { h += `<option value="${esc(o.name)}" ${state.selections[step.label]===o.name?'selected':''}>${esc(o.name)}</option>`; });
+      h += `</select></div>`;
+    });
+
+    h += `<div class="fg"><div class="fl">Cantitate</div><div class="qty-row"><button class="qty-btn" id="qm">\u2212</button><input type="number" class="qty-input" id="qi" value="${state.quantity}" min="1"><button class="qty-btn" id="qp">+</button></div></div>`;
+    h += `<div class="fg"><div class="fl">Detalii suplimentare</div><textarea id="di" placeholder="Dimensiuni exacte, culori, informatii extra...">${esc(state.details)}</textarea></div>`;
+
+    h += `<div class="addon-box"><div class="addon-header"><input type="checkbox" id="dc" ${state.designAddon?'checked':''}><label for="dc">Ai nevoie de ajutor cu designul?</label><span class="addon-desc">serviciu extra</span></div>`;
+    h += `<div class="addon-body ${state.designAddon?'open':''}"><div class="fg"><div class="fl">Tip serviciu design</div><select id="ds"><option value="">\u2014 Alege \u2014</option>`;
+    DESIGN_OPTIONS.forEach(o => { h += `<option value="${esc(o)}" ${state.designService===o?'selected':''}>${esc(o)}</option>`; });
+    h += `</select></div></div></div>`;
+
+    h += `<hr class="divider"><div class="section-title">Date de contact</div>`;
+    h += `<div class="fg"><div class="fl">Nume</div><input type="text" id="cn" value="${esc(state.contact.name)}" placeholder="Ion Popescu"></div>`;
+    h += `<div class="fg"><div class="fl">Email</div><input type="email" id="ce" value="${esc(state.contact.email)}" placeholder="ion@email.com"></div>`;
+    h += `<div class="fg"><div class="fl">Telefon</div><input type="tel" id="cp" value="${esc(state.contact.phone)}" placeholder="0712 345 678"></div>`;
+  }
+  el.innerHTML = h;
+  bindForm();
+}
+
+// ═══════════════════════════════════════
+// RENDER PANEL (RIGHT COLUMN)
+// ═══════════════════════════════════════
+
+function renderPanel() {
+  const el = document.getElementById("panelCol");
+  if (mode === "client") { renderClientPanel(el); } else { renderAdminPanel(el); }
+}
+
+function renderClientPanel(el) {
+  let h = `<div class="preview-box"><div class="preview-icon">&#9634;</div><div class="preview-text">${esc(state.category||'Preview produs')}</div></div>`;
+  h += `<div class="summary-box"><div class="summary-header">Rezumat selectii</div>`;
+  if (!state.category) { h += `<div class="summary-empty">Alege o categorie</div>`; }
+  else {
+    h += sr("Categorie", state.category);
+    if (data[state.category]) data[state.category].steps.forEach(s => { const v = state.selections[s.label]; if (v) h += sr(s.label, v); });
+    h += sr("Cantitate", state.quantity);
+    if (state.designAddon && state.designService) h += sr("Design", state.designService);
+    if (state.contact.name) h += sr("Nume", state.contact.name);
+  }
+  h += `</div>`;
+  if (state.category) h += `<button class="btn-submit" id="sb">Trimite cererea de oferta</button>`;
+  el.innerHTML = h;
+  const sb = document.getElementById("sb");
+  if (sb) sb.addEventListener("click", () => alert("Cerere trimisa! (prototip)"));
+}
+
+function sr(k,v) { return `<div class="summary-row"><span class="summary-key">${esc(k)}</span><span class="summary-val">${esc(String(v))}</span></div>`; }
+
+function isReadOnly() { return profiles.active === "Default"; }
+
+function renderAdminPanel(el) {
+  let h = `<div class="admin-panel">`;
+  if (!state.category) { h += `<div class="summary-empty">Selecteaza o categorie in stanga pentru a edita optiunile</div>`; }
+  else {
+    const cat = data[state.category];
+    h += `<div class="admin-cat-title">${esc(state.category)}</div>`;
+    if (isReadOnly()) {
+      h += `<div style="background:linear-gradient(90deg,rgba(255,163,0,.08),rgba(255,163,0,.02));border:1.5px solid rgba(255,163,0,.4);border-left:4px solid var(--orange);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--dark);font-family:var(--font-display);font-weight:500">Profilul <b style="color:var(--orange)">Default</b> este read-only. Duplica-l pentru a edita.</div>`;
+    }
+
+    cat.steps.forEach((step, si) => {
+      const isOpen = openSteps[state.category + si];
+      const stepType = getStepType(step.label, state.category);
+      h += `<div class="admin-step">`;
+      h += `<div class="admin-step-header" data-toggle="${si}"><span class="admin-step-label">${isOpen?'\u25BC':'\u25B6'} ${esc(step.label)} (${step.options.length})</span>`;
+      if (!isReadOnly()) {
+        h += `<div class="admin-step-actions"><button data-rename="${si}">Rename</button><button class="del" data-delstep="${si}">\u00d7</button></div>`;
+      }
+      h += `</div>`;
+
+      h += `<div class="admin-step-body ${isOpen?'open':''}">`;
+      h += renderStepVisual(step, si, stepType);
+      if (!isReadOnly()) h += renderAddRow(si, stepType);
+      h += `</div></div>`;
+    });
+
+    if (!isReadOnly()) {
+      h += `<div class="admin-add-step"><button id="addStepBtn">+ Adauga pas nou</button></div>`;
+    }
+    h += `<div class="admin-io"><button id="exportBtn">Export JSON</button>`;
+    if (!isReadOnly()) {
+      h += `<button id="importBtn">Import JSON</button><button id="resetDataBtn">Reset la default</button>`;
+    }
+    h += `</div>`;
+  }
+  h += `</div>`;
+  el.innerHTML = h;
+  bindAdmin();
+}
+
+// ── Render step content based on type ──
+function renderStepVisual(step, si, stepType) {
+  let h = '';
+  switch(stepType) {
+    case 'product':
+      h += `<div class="visual-grid">`;
+      step.options.forEach((opt, oi) => {
+        h += `<div class="visual-card" data-edit-si="${si}" data-edit-oi="${oi}" title="Click to edit">`;
+        h += svgProductIcon(opt.name);
+        h += `<span class="vc-name">${esc(opt.name)}</span>`;
+        h += `<button class="vc-del" data-si="${si}" data-oi="${oi}">\u00d7</button>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+      break;
+
+    case 'material':
+      h += `<div class="mat-list">`;
+      step.options.forEach((opt, oi) => {
+        h += `<div class="mat-item">`;
+        h += `<div class="mat-actions"><button data-edit-mat-si="${si}" data-edit-mat-oi="${oi}">Edit</button><button class="del" data-si="${si}" data-oi="${oi}">\u00d7</button></div>`;
+        h += `<span class="mat-name">${esc(opt.name)}</span>`;
+        if (opt.url) h += `<a class="mat-url" href="${esc(opt.url)}" target="_blank" rel="noopener">${esc(opt.url)}</a>`;
+        if (opt.note) h += `<span class="mat-note">${esc(opt.note)}</span>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+      break;
+
+    case 'dimension':
+      // Check if this is a dynamic dimension step (Print Digital)
+      if (step.dynamic === 'printDims' && data[state.category].dimsByProduct) {
+        const dbp = data[state.category].dimsByProduct;
+        Object.keys(dbp).forEach(prodName => {
+          h += `<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${esc(prodName)}</div>`;
+          h += `<div class="dim-grid">`;
+          dbp[prodName].forEach((opt, oi) => {
+            h += `<div class="dim-card" data-edit-dbp="${esc(prodName)}" data-edit-dbp-oi="${oi}" title="Click to edit">`;
+            h += svgDimensionDiagram(opt.name);
+            h += `<span class="dim-label">${esc(opt.name)}</span>`;
+            h += `<button class="vc-del" data-del-dbp="${esc(prodName)}" data-del-dbp-oi="${oi}">\u00d7</button>`;
+            h += `</div>`;
+          });
+          h += `</div>`;
+          h += `<div class="admin-add-row"><input type="text" id="newDbp_${prodName.replace(/[^a-zA-Z0-9]/g,'_')}" placeholder="Dimensiune noua..."><button data-adddbp="${esc(prodName)}">+</button></div>`;
+          h += `</div>`;
+        });
+      } else {
+        h += `<div class="dim-grid">`;
+        step.options.forEach((opt, oi) => {
+          h += `<div class="dim-card" data-edit-si="${si}" data-edit-oi="${oi}" title="Click to edit">`;
+          h += svgDimensionDiagram(opt.name);
+          h += `<span class="dim-label">${esc(opt.name)}</span>`;
+          h += `<button class="vc-del" data-si="${si}" data-oi="${oi}">\u00d7</button>`;
+          h += `</div>`;
+        });
+        h += `</div>`;
+      }
+      break;
+
+    case 'finish':
+      h += `<div class="illust-grid">`;
+      step.options.forEach((opt, oi) => {
+        h += `<div class="illust-card" data-edit-si="${si}" data-edit-oi="${oi}" title="Click to edit">`;
+        h += svgFinishIllust(opt.name);
+        h += `<span class="vc-name">${esc(opt.name)}</span>`;
+        h += `<button class="vc-del" data-si="${si}" data-oi="${oi}">\u00d7</button>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+      break;
+
+    case 'cut':
+      h += `<div class="illust-grid">`;
+      step.options.forEach((opt, oi) => {
+        h += `<div class="illust-card" data-edit-si="${si}" data-edit-oi="${oi}" title="Click to edit">`;
+        h += svgCutIllust(opt.name);
+        h += `<span class="vc-name">${esc(opt.name)}</span>`;
+        if (opt.note) h += `<span style="font-size:8px;color:#888;font-style:italic">${esc(opt.note)}</span>`;
+        h += `<button class="vc-del" data-si="${si}" data-oi="${oi}">\u00d7</button>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+      break;
+
+    case 'sasiu':
+      h += `<div class="illust-grid">`;
+      step.options.forEach((opt, oi) => {
+        h += `<div class="illust-card" data-edit-si="${si}" data-edit-oi="${oi}" title="Click to edit">`;
+        h += svgSasiuIllust(opt.name);
+        h += `<span class="vc-name">${esc(opt.name)}</span>`;
+        h += `<button class="vc-del" data-si="${si}" data-oi="${oi}">\u00d7</button>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+      break;
+
+    case 'text':
+    default:
+      h += `<div class="text-grid">`;
+      step.options.forEach((opt, oi) => {
+        h += `<div class="text-card" data-edit-si="${si}" data-edit-oi="${oi}" title="Click to edit">${esc(opt.name)}`;
+        h += `<button class="vc-del" data-si="${si}" data-oi="${oi}">\u00d7</button>`;
+        h += `</div>`;
+      });
+      h += `</div>`;
+      break;
+  }
+  return h;
+}
+
+function renderAddRow(si, stepType) {
+  let h = `<div class="admin-add-row">`;
+  h += `<input type="text" id="newOpt${si}" placeholder="Optiune noua...">`;
+  if (stepType === 'material') {
+    h += `<input type="url" id="newOptUrl${si}" placeholder="URL Verla (optional)">`;
+    h += `<input type="text" id="newOptNote${si}" placeholder="Nota (optional)">`;
+  }
+  h += `<button data-addopt="${si}">+ Adauga</button>`;
+  h += `</div>`;
+  return h;
+}
+
+// ═══════════════════════════════════════
+// MODAL DIALOGS
+// ═══════════════════════════════════════
+
+function showModal(title, fields, onSave) {
+  const root = document.getElementById('modalRoot');
+  let h = `<div class="modal-overlay" id="modalOverlay"><div class="modal-box"><h3>${esc(title)}</h3>`;
+  fields.forEach(f => {
+    h += `<div class="fg"><div class="fl">${esc(f.label)}</div><input type="${f.type||'text'}" id="modal_${f.key}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}"></div>`;
+  });
+  h += `<div class="modal-btns"><button class="btn-cancel" id="modalCancel">Anuleaza</button><button class="btn-save" id="modalSave">Salveaza</button></div>`;
+  h += `</div></div>`;
+  root.innerHTML = h;
+
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+  document.getElementById('modalSave').addEventListener('click', () => {
+    const values = {};
+    fields.forEach(f => { values[f.key] = document.getElementById('modal_' + f.key).value; });
+    onSave(values);
+    closeModal();
+  });
+  // Focus first input
+  const firstInput = root.querySelector('input');
+  if (firstInput) setTimeout(() => firstInput.focus(), 50);
+  // Enter key to save
+  root.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('modalSave').click(); });
+  });
+}
+
+function closeModal() {
+  document.getElementById('modalRoot').innerHTML = '';
+}
+
+// ═══════════════════════════════════════
+// BIND FORM EVENTS
+// ═══════════════════════════════════════
+
+function bindForm() {
+  const cs = document.getElementById("catSelect");
+  if (cs) cs.addEventListener("change", () => {
+    if (state.category !== cs.value) { state.category = cs.value; state.selections = {}; state.quantity = 100; state.details = ""; state.designAddon = false; state.designService = ""; }
+    renderForm(); renderPanel();
+  });
+  document.querySelectorAll("[data-step]").forEach(s => s.addEventListener("change", () => {
+    state.selections[s.dataset.step] = s.value;
+    // When changing Tip produs in Print Digital, reset Dimensiune and re-render form
+    if (s.dataset.step === "Tip produs" && state.category === "Print Digital (OKI)") {
+      delete state.selections["Dimensiune"];
+      renderForm();
+    }
+    if (mode==="client") renderPanel();
+  }));
+  const qm=document.getElementById("qm"),qp=document.getElementById("qp"),qi=document.getElementById("qi");
+  if(qm)qm.addEventListener("click",()=>{if(state.quantity>1){state.quantity--;qi.value=state.quantity}});
+  if(qp)qp.addEventListener("click",()=>{state.quantity++;qi.value=state.quantity});
+  if(qi)qi.addEventListener("change",()=>{state.quantity=Math.max(1,parseInt(qi.value)||1);qi.value=state.quantity});
+  const di=document.getElementById("di");if(di)di.addEventListener("input",()=>{state.details=di.value});
+  const dc=document.getElementById("dc");if(dc)dc.addEventListener("change",()=>{state.designAddon=dc.checked;if(!dc.checked)state.designService="";renderForm()});
+  const ds=document.getElementById("ds");if(ds)ds.addEventListener("change",()=>{state.designService=ds.value});
+  const cn=document.getElementById("cn"),ce=document.getElementById("ce"),cp=document.getElementById("cp");
+  if(cn)cn.addEventListener("input",()=>{state.contact.name=cn.value});
+  if(ce)ce.addEventListener("input",()=>{state.contact.email=ce.value});
+  if(cp)cp.addEventListener("input",()=>{state.contact.phone=cp.value});
+}
+
+// ═══════════════════════════════════════
+// BIND ADMIN EVENTS
+// ═══════════════════════════════════════
+
+function bindAdmin() {
+  // Toggle steps
+  document.querySelectorAll("[data-toggle]").forEach(el => el.addEventListener("click", e => {
+    if (e.target.closest("[data-rename]") || e.target.closest("[data-delstep]")) return;
+    const si = el.dataset.toggle;
+    openSteps[state.category + si] = !openSteps[state.category + si];
+    renderPanel();
+  }));
+
+  // Delete option (from any card type)
+  document.querySelectorAll("button.vc-del, .mat-actions button.del").forEach(btn => btn.addEventListener("click", e => {
+    e.stopPropagation();
+    if (isReadOnly()) { alert("Profilul Default este read-only. Duplica-l pentru a edita."); return; }
+    const si = parseInt(btn.dataset.si);
+    const oi = parseInt(btn.dataset.oi);
+    if (confirm(`Stergi "${data[state.category].steps[si].options[oi].name}"?`)) {
+      data[state.category].steps[si].options.splice(oi, 1);
+      saveData(); renderForm(); renderPanel();
+    }
+  }));
+
+  // Edit product / dimension / finish / cut / sasiu / text cards (click on card)
+  document.querySelectorAll("[data-edit-si]").forEach(card => card.addEventListener("click", e => {
+    if (e.target.closest('.vc-del')) return;
+    if (isReadOnly()) return;
+    const si = parseInt(card.dataset.editSi);
+    const oi = parseInt(card.dataset.editOi);
+    const opt = data[state.category].steps[si].options[oi];
+    const stepType = getStepType(data[state.category].steps[si].label, state.category);
+
+    const fields = [{key:'name', label:'Nume', value:opt.name, placeholder:'Numele optiunii'}];
+    if (stepType === 'cut' || opt.note !== undefined) {
+      fields.push({key:'note', label:'Nota interna', value:opt.note||'', placeholder:'Nota (optional)'});
+    }
+
+    showModal('Editeaza optiune', fields, vals => {
+      if (vals.name.trim()) {
+        opt.name = vals.name.trim();
+        if (vals.note !== undefined) opt.note = vals.note.trim() || undefined;
+        saveData(); renderForm(); renderPanel();
+      }
+    });
+  }));
+
+  // Edit material items
+  document.querySelectorAll("[data-edit-mat-si]").forEach(btn => btn.addEventListener("click", e => {
+    e.stopPropagation();
+    if (isReadOnly()) return;
+    const si = parseInt(btn.dataset.editMatSi);
+    const oi = parseInt(btn.dataset.editMatOi);
+    const opt = data[state.category].steps[si].options[oi];
+
+    showModal('Editeaza material', [
+      {key:'name', label:'Nume', value:opt.name, placeholder:'Numele materialului'},
+      {key:'url', label:'URL Verla', value:opt.url||'', type:'url', placeholder:'https://verla.ro/...'},
+      {key:'note', label:'Nota interna', value:opt.note||'', placeholder:'Nota (optional)'}
+    ], vals => {
+      if (vals.name.trim()) {
+        opt.name = vals.name.trim();
+        opt.url = vals.url.trim() || undefined;
+        opt.note = vals.note.trim() || undefined;
+        saveData(); renderForm(); renderPanel();
+      }
+    });
+  }));
+
+  // Add option
+  document.querySelectorAll("[data-addopt]").forEach(btn => btn.addEventListener("click", () => {
+    const si = btn.dataset.addopt;
+    const inp = document.getElementById("newOpt" + si);
+    const urlInp = document.getElementById("newOptUrl" + si);
+    const noteInp = document.getElementById("newOptNote" + si);
+    if (inp && inp.value.trim()) {
+      const newOpt = {name: inp.value.trim()};
+      if (urlInp && urlInp.value.trim()) newOpt.url = urlInp.value.trim();
+      if (noteInp && noteInp.value.trim()) newOpt.note = noteInp.value.trim();
+      data[state.category].steps[si].options.push(newOpt);
+      saveData(); renderForm(); renderPanel();
+    }
+  }));
+
+  // Enter key on add inputs
+  document.querySelectorAll(".admin-add-row input").forEach(inp => {
+    inp.addEventListener("keydown", e => {
+      if (e.key === 'Enter') {
+        const btn = inp.closest('.admin-add-row').querySelector('button');
+        if (btn) btn.click();
+      }
+    });
+  });
+
+  // Delete dimsByProduct option
+  document.querySelectorAll("[data-del-dbp]").forEach(btn => btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const prodName = btn.dataset.delDbp;
+    const oi = parseInt(btn.dataset.delDbpOi);
+    const dbp = data[state.category].dimsByProduct;
+    if (dbp && dbp[prodName] && confirm(`Stergi "${dbp[prodName][oi].name}"?`)) {
+      dbp[prodName].splice(oi, 1);
+      saveData(); renderForm(); renderPanel();
+    }
+  }));
+
+  // Edit dimsByProduct option
+  document.querySelectorAll("[data-edit-dbp]").forEach(card => card.addEventListener("click", e => {
+    if (e.target.closest('.vc-del')) return;
+    const prodName = card.dataset.editDbp;
+    const oi = parseInt(card.dataset.editDbpOi);
+    const dbp = data[state.category].dimsByProduct;
+    if (!dbp || !dbp[prodName]) return;
+    const opt = dbp[prodName][oi];
+    showModal('Editeaza dimensiune — ' + prodName, [
+      {key:'name', label:'Dimensiune', value:opt.name, placeholder:'ex: A4 (210x297mm)'}
+    ], vals => {
+      if (vals.name.trim()) { opt.name = vals.name.trim(); saveData(); renderForm(); renderPanel(); }
+    });
+  }));
+
+  // Add dimsByProduct option
+  document.querySelectorAll("[data-adddbp]").forEach(btn => btn.addEventListener("click", () => {
+    const prodName = btn.dataset.adddbp;
+    const inputId = "newDbp_" + prodName.replace(/[^a-zA-Z0-9]/g,'_');
+    const inp = document.getElementById(inputId);
+    if (inp && inp.value.trim()) {
+      const dbp = data[state.category].dimsByProduct;
+      if (dbp && dbp[prodName]) {
+        dbp[prodName].push({name: inp.value.trim()});
+        saveData(); renderForm(); renderPanel();
+      }
+    }
+  }));
+
+  // Rename step
+  document.querySelectorAll("[data-rename]").forEach(btn => btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const si = btn.dataset.rename;
+    const current = data[state.category].steps[si].label;
+    showModal('Redenumeste pasul', [
+      {key:'label', label:'Numele pasului', value:current}
+    ], vals => {
+      if (vals.label.trim()) {
+        data[state.category].steps[si].label = vals.label.trim();
+        saveData(); renderForm(); renderPanel();
+      }
+    });
+  }));
+
+  // Delete step
+  document.querySelectorAll("[data-delstep]").forEach(btn => btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const si = btn.dataset.delstep;
+    if (confirm('Stergi pasul "' + data[state.category].steps[si].label + '"?')) {
+      data[state.category].steps.splice(si, 1);
+      saveData(); renderForm(); renderPanel();
+    }
+  }));
+
+  // Add step
+  const addStepBtn = document.getElementById("addStepBtn");
+  if (addStepBtn) addStepBtn.addEventListener("click", () => {
+    showModal('Adauga pas nou', [
+      {key:'label', label:'Numele pasului', placeholder:'ex: Material, Dimensiune...'}
+    ], vals => {
+      if (vals.label.trim()) {
+        data[state.category].steps.push({label: vals.label.trim(), options: []});
+        saveData(); renderForm(); renderPanel();
+      }
+    });
+  });
+
+  // Export
+  const exportBtn = document.getElementById("exportBtn");
+  if (exportBtn) exportBtn.addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "cismind-configurator-data.json"; a.click();
+  });
+
+  // Import
+  const importBtn = document.getElementById("importBtn");
+  if (importBtn) importBtn.addEventListener("click", () => {
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json";
+    inp.addEventListener("change", () => {
+      const reader = new FileReader();
+      reader.onload = () => { try { data = JSON.parse(reader.result); saveData(); renderForm(); renderPanel(); alert("Importat cu succes!"); } catch(e) { alert("JSON invalid"); } };
+      reader.readAsText(inp.files[0]);
+    });
+    inp.click();
+  });
+
+  // Reset
+  const resetDataBtn = document.getElementById("resetDataBtn");
+  if (resetDataBtn) resetDataBtn.addEventListener("click", () => {
+    if (confirm("Resetezi la datele implicite? Pierzi modificarile.")) {
+      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      saveData(); renderForm(); renderPanel();
+    }
+  });
+}
+
+// ── Mode toggle ──
+document.getElementById("modeAdmin").addEventListener("click", () => { mode = "admin"; document.getElementById("modeAdmin").classList.add("active"); document.getElementById("modeClient").classList.remove("active"); renderPanel(); });
+document.getElementById("modeClient").addEventListener("click", () => { mode = "client"; document.getElementById("modeClient").classList.add("active"); document.getElementById("modeAdmin").classList.remove("active"); renderPanel(); });
+
+// ── Init ──
+renderProfilesBar(); renderForm(); renderPanel();
+</script>
+</body>
+</html>

@@ -42,20 +42,21 @@ import emailjs from "@emailjs/browser";
 import {
   User, Mail, Phone, Package, Hash, Ruler,
   FileText, Send, CheckCircle, AlertCircle, Loader,
+  Zap, Palette, MapPin,
 } from "lucide-react";
 import svgPaths from "../../imports/Website/svg-kqn5vv4qme";
 import { loadSiteData } from "../store/siteData";
 
-// ── EmailJS config ─────────────────────────────────────────────────────────────
-const EMAILJS_SERVICE_ID  = "YOUR_SERVICE_ID";   // ex: "service_abc123"
-const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";  // ex: "template_xyz789"
-const EMAILJS_PUBLIC_KEY  = "YOUR_PUBLIC_KEY";   // ex: "aBcDeFgHiJkLmNoP"
+// ── EmailJS config (set in .env) ────────────────────────────────────────────────
+const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  ?? "";
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? "";
+const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  ?? "";
 
 // Detectează dacă EmailJS e configurat cu date reale
 const EMAILJS_CONFIGURED =
-  EMAILJS_SERVICE_ID !== "YOUR_SERVICE_ID" &&
-  EMAILJS_TEMPLATE_ID !== "YOUR_TEMPLATE_ID" &&
-  EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY";
+  EMAILJS_SERVICE_ID !== "" &&
+  EMAILJS_TEMPLATE_ID !== "" &&
+  EMAILJS_PUBLIC_KEY !== "";
 
 // ── Product options ────────────────────────────────────────────────────────────
 const PRODUCT_OPTIONS: Record<string, string[]> = {
@@ -101,9 +102,9 @@ function SectionLabel({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-2">
       <svg width="19" height="24" fill="none" viewBox="0 0 18.3439 23.6943">
-        <path d={svgPaths.p135cec80} fill="#D30052" />
+        <path d={svgPaths.p135cec80} fill="#e70050" />
       </svg>
-      <span className="text-[18px] text-white/80" style={{ fontFamily: "Mulish, sans-serif" }}>
+      <span className="text-[18px] text-white/80 font-['Mulish',sans-serif]">
         {text}
       </span>
     </div>
@@ -116,26 +117,28 @@ function InputWrapper({
   required,
   children,
   error,
+  htmlFor,
 }: {
   label: string;
   icon: React.ReactNode;
   required?: boolean;
   children: React.ReactNode;
   error?: string;
+  htmlFor?: string;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label
-        className="flex items-center gap-1.5 text-[13px] text-white/75"
-        style={{ fontFamily: "Mulish, sans-serif", fontWeight: 600 }}
+        htmlFor={htmlFor}
+        className="flex items-center gap-1.5 text-[13px] text-white/75 font-['Mulish',sans-serif] font-semibold"
       >
-        <span className="text-white/40">{icon}</span>
+        <span className="text-white/60">{icon}</span>
         {label}
-        {required && <span className="text-[#f5a623]">*</span>}
+        {required && <span className="text-[#ffa300]">*</span>}
       </label>
       {children}
       {error && (
-        <p className="text-[#f5a623] text-[12px] flex items-center gap-1" style={{ fontFamily: "Mulish, sans-serif" }}>
+        <p className="text-[#ffa300] text-[12px] flex items-center gap-1 font-['Mulish',sans-serif]">
           <AlertCircle size={11} />
           {error}
         </p>
@@ -145,32 +148,27 @@ function InputWrapper({
 }
 
 const inputClass =
-  "w-full px-4 py-3 text-[14px] text-white placeholder-white/30 outline-none transition-colors duration-200 border border-white/15 bg-transparent hover:border-white/30 focus:border-[#f5a623]";
-const inputStyle = {
-  fontFamily: "Inter, sans-serif",
-};
+  "w-full px-4 py-3 text-[14px] text-white placeholder-white/40 outline-none transition-colors duration-200 border border-white/20 bg-white/5 hover:border-white/35 focus:border-[#ffa300] rounded-xl font-['Mulish',sans-serif]";
 
 // ── Info cards ─────────────────────────────────────────────────────────────────
 const infoCards = [
   {
-    icon: "⚡",
+    Icon: Zap,
+    color: "#ffa300",
     title: "Răspuns rapid",
     desc: "Îți trimitem oferta în maxim 24h lucrătoare de la primirea cererii.",
   },
   {
-    icon: "🎨",
+    Icon: Palette,
+    color: "#e70050",
     title: "Consultanță gratuită",
     desc: "Echipa noastră te ajută să alegi materialele și finisajele potrivite.",
   },
   {
-    icon: "📦",
+    Icon: MapPin,
+    color: "#652f7d",
     title: "Livrare în toată România",
     desc: "Livrăm prin curier sau poți ridica personal din Timișoara.",
-  },
-  {
-    icon: "✅",
-    title: "Fără cantitate minimă",
-    desc: "Acceptăm comenzi de la 1 bucată — ideal pentru teste și prototipuri.",
   },
 ];
 
@@ -274,35 +272,32 @@ export function OrderForm() {
   return (
     <section
       id="comanda"
-      className="w-full px-6 md:px-12 py-20 flex flex-col gap-12"
+      className="w-full py-20"
       style={{ background: "linear-gradient(145deg, #1a1f29 0%, #222b37 50%, #2a1a3e 100%)" }}
     >
+      <div className="max-w-[1440px] mx-auto w-full px-6 md:px-12 flex flex-col gap-10">
       {/* ── Header ── */}
       <div className="flex flex-col gap-3 max-w-xl">
         <SectionLabel text="Formular de comandă" />
         <div className="flex flex-col" style={{ gap: "2px" }}>
           <h2
-            className="text-white"
-            style={{ fontFamily: "Mulish, sans-serif", fontWeight: 800, fontSize: "clamp(28px, 3.3vw, 48px)", lineHeight: 1.1 }}
+            className="text-white font-['Mulish',sans-serif] font-extrabold leading-[1.1]"
+            style={{ fontSize: "clamp(28px, 3.3vw, 48px)" }}
           >
             Plasează o comandă
           </h2>
           <h2
-            className="bg-clip-text text-transparent"
+            className="font-['Mulish',sans-serif] font-extrabold leading-[1.1]"
             style={{
-              fontFamily: "Mulish, sans-serif",
-              fontWeight: 800,
               fontSize: "clamp(28px, 3.3vw, 48px)",
-              lineHeight: 1.1,
-              backgroundImage: "linear-gradient(90deg, #f5a623, #d30052)",
+              color: "#e70050",
             }}
           >
             simplu și rapid
           </h2>
         </div>
         <p
-          className="text-white/55 text-[16px] leading-relaxed mt-2"
-          style={{ fontFamily: "Mulish, sans-serif" }}
+          className="text-white/55 text-[16px] leading-relaxed mt-2 font-['Mulish',sans-serif]"
         >
           Completează formularul și te contactăm în maxim 24h cu oferta personalizată.
         </p>
@@ -315,34 +310,29 @@ export function OrderForm() {
         <div className="lg:col-span-3">
           {formState === "success" ? (
             <div
-              className="flex flex-col items-center gap-5 py-16 px-8 rounded-2xl text-center"
+              className="flex flex-col items-center gap-5 py-16 px-8 rounded-xl text-center"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
             >
               <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "rgba(245,166,35,0.15)" }}>
-                <CheckCircle size={32} color="#f5a623" />
+                <CheckCircle size={32} color="#ffa300" />
               </div>
               <div>
                 <h3
-                  className="text-white text-[24px]"
-                  style={{ fontFamily: "Mulish, sans-serif", fontWeight: 800 }}
+                  className="text-white text-[24px] font-['Mulish',sans-serif] font-extrabold"
                 >
                   Cerere trimisă cu succes!
                 </h3>
                 <p
-                  className="text-white/55 text-[15px] mt-2 leading-relaxed"
-                  style={{ fontFamily: "Mulish, sans-serif" }}
+                  className="text-white/55 text-[15px] mt-2 leading-relaxed font-['Mulish',sans-serif]"
                 >
                   Am primit comanda ta. Te contactăm în maxim 24h lucrătoare la emailul sau telefonul furnizat.
                 </p>
               </div>
               <button
                 onClick={() => setFormState("idle")}
-                className="mt-2 px-8 py-3 text-[12px] tracking-[0.84px] uppercase transition-colors hover:bg-[#b0003f]"
+                className="mt-2 px-8 py-3 text-[12px] tracking-[0.84px] uppercase transition-colors hover:bg-[#b0003f] font-['Inter',sans-serif] font-semibold text-white rounded-xl"
                 style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  background: "#d30052",
-                  color: "white",
+                  background: "#e70050",
                 }}
               >
                 Trimite o altă cerere
@@ -362,49 +352,60 @@ export function OrderForm() {
 
               {/* ── Row 1: Nume + Email ── */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <InputWrapper label="Nume complet" icon={<User size={13} />} required error={errors.from_name}>
+                <InputWrapper label="Nume complet" icon={<User size={13} />} required error={errors.from_name} htmlFor="from_name">
                   <input
+                    id="from_name"
                     type="text"
                     name="from_name"
-                    placeholder="Ion Popescu"
+                    placeholder="Radu Marcel"
+                    aria-required="true"
+                    aria-invalid={!!errors.from_name}
                     className={inputClass}
-                    style={inputStyle}
+
                   />
                 </InputWrapper>
 
-                <InputWrapper label="Adresă email" icon={<Mail size={13} />} required error={errors.from_email}>
+                <InputWrapper label="Adresă email" icon={<Mail size={13} />} required error={errors.from_email} htmlFor="from_email">
                   <input
+                    id="from_email"
                     type="email"
                     name="from_email"
                     placeholder="ion@firma.ro"
+                    aria-required="true"
+                    aria-invalid={!!errors.from_email}
                     className={inputClass}
-                    style={inputStyle}
+
                   />
                 </InputWrapper>
               </div>
 
               {/* ── Row 2: Telefon ── */}
-              <InputWrapper label="Număr de telefon" icon={<Phone size={13} />} required error={errors.phone}>
+              <InputWrapper label="Număr de telefon" icon={<Phone size={13} />} required error={errors.phone} htmlFor="phone">
                 <input
+                  id="phone"
                   type="tel"
                   name="phone"
                   placeholder="07xx xxx xxx"
+                  aria-required="true"
+                  aria-invalid={!!errors.phone}
                   className={inputClass}
-                  style={inputStyle}
                 />
               </InputWrapper>
 
               {/* ── Row 3: Tip produs + Sub-tip ── */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <InputWrapper label="Tip produs" icon={<Package size={13} />} required error={errors.product_type}>
+                <InputWrapper label="Tip produs" icon={<Package size={13} />} required error={errors.product_type} htmlFor="product_type">
                   <select
+                    id="product_type"
                     value={productType}
                     onChange={(e) => {
                       setProductType(e.target.value);
                       setProductSubtype("");
                     }}
+                    aria-required="true"
+                    aria-invalid={!!errors.product_type}
                     className={inputClass + " cursor-pointer"}
-                    style={{ ...inputStyle, appearance: "none" }}
+                    style={{ appearance: "none" }}
                   >
                     <option value="" disabled style={{ background: "#222b37" }}>Alege categoria...</option>
                     {Object.keys(PRODUCT_OPTIONS).map((cat) => (
@@ -413,13 +414,14 @@ export function OrderForm() {
                   </select>
                 </InputWrapper>
 
-                <InputWrapper label="Produs specific" icon={<Package size={13} />}>
+                <InputWrapper label="Produs specific" icon={<Package size={13} />} htmlFor="product_subtype">
                   <select
+                    id="product_subtype"
                     value={productSubtype}
                     onChange={(e) => setProductSubtype(e.target.value)}
                     disabled={subtypes.length === 0}
                     className={inputClass + " cursor-pointer disabled:opacity-40"}
-                    style={{ ...inputStyle, appearance: "none" }}
+                    style={{ appearance: "none" }}
                   >
                     <option value="" style={{ background: "#222b37" }}>
                       {subtypes.length === 0 ? "— alege mai întâi categoria —" : "Alege produsul..."}
@@ -433,48 +435,51 @@ export function OrderForm() {
 
               {/* ── Row 4: Cantitate + Dimensiuni ── */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <InputWrapper label="Cantitate estimată" icon={<Hash size={13} />}>
+                <InputWrapper label="Cantitate estimată" icon={<Hash size={13} />} htmlFor="quantity">
                   <input
+                    id="quantity"
                     type="number"
                     name="quantity"
                     min="1"
                     placeholder="ex: 100"
                     className={inputClass}
-                    style={inputStyle}
+
                   />
                 </InputWrapper>
 
-                <InputWrapper label="Dimensiuni / Format" icon={<Ruler size={13} />}>
+                <InputWrapper label="Dimensiuni / Format" icon={<Ruler size={13} />} htmlFor="dimensions">
                   <input
+                    id="dimensions"
                     type="text"
                     name="dimensions"
                     placeholder="ex: A4, 50×70cm, XL"
                     className={inputClass}
-                    style={inputStyle}
+
                   />
                 </InputWrapper>
               </div>
 
               {/* ── Row 5: Detalii ── */}
-              <InputWrapper label="Detalii comandă" icon={<FileText size={13} />} required error={errors.details}>
+              <InputWrapper label="Detalii comandă" icon={<FileText size={13} />} required error={errors.details} htmlFor="details">
                 <textarea
+                  id="details"
                   name="details"
                   rows={5}
+                  aria-required="true"
+                  aria-invalid={!!errors.details}
                   placeholder="Descrie ce dorești: material, finisaj, culori, fișier disponibil, termen dorit..."
                   className={inputClass + " resize-none"}
-                  style={inputStyle}
                 />
               </InputWrapper>
 
               {/* ── Error general ── */}
               {formState === "error" && (
                 <div
-                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-[13px]"
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl text-[13px] font-['Mulish',sans-serif]"
                   style={{
-                    fontFamily: "Mulish, sans-serif",
                     background: "rgba(211,0,82,0.12)",
                     border: "1px solid rgba(211,0,82,0.3)",
-                    color: "#f5a623",
+                    color: "#ffa300",
                   }}
                 >
                   <AlertCircle size={15} />
@@ -485,30 +490,18 @@ export function OrderForm() {
               {/* ── Submit button ── */}
               <button
                 type="submit"
-                disabled={formState === "sending"}
-                className="w-full flex items-center justify-center gap-2.5 py-4 text-white text-[12px] tracking-[0.84px] uppercase transition-colors hover:bg-[#b0003f] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                disabled
+                className="w-full flex items-center justify-center gap-2.5 py-4 text-white text-[12px] tracking-[0.84px] uppercase mt-2 font-['Inter',sans-serif] font-semibold rounded-xl opacity-50 cursor-not-allowed"
                 style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  background: "#d30052",
+                  background: "#e70050",
                 }}
               >
-                {formState === "sending" ? (
-                  <>
-                    <Loader size={18} className="animate-spin" />
-                    Se trimite...
-                  </>
-                ) : (
-                  <>
-                    <Send size={18} strokeWidth={2.2} />
-                    Trimite cererea de ofertă
-                  </>
-                )}
+                <Send size={18} strokeWidth={2.2} />
+                Momentan indisponibil — revenim în curând
               </button>
 
               <p
-                className="text-center text-white/30 text-[12px]"
-                style={{ fontFamily: "Mulish, sans-serif" }}
+                className="text-center text-white/60 text-[12px] font-['Mulish',sans-serif]"
               >
                 Datele tale sunt confidențiale și nu sunt distribuite terților.
               </p>
@@ -519,25 +512,24 @@ export function OrderForm() {
         {/* ── INFO sidebar ── (2/5) */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Info cards */}
-          {infoCards.map((card) => (
+          {infoCards.map(({ Icon, color, title, desc }) => (
             <div
-              key={card.title}
-              className="flex gap-4 p-5 rounded-2xl"
+              key={title}
+              className="flex gap-4 p-5 rounded-xl"
               style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
-              <span className="text-[24px] flex-shrink-0 mt-0.5">{card.icon}</span>
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${color}20` }}
+              >
+                <Icon size={18} color={color} strokeWidth={2} />
+              </div>
               <div>
-                <p
-                  className="text-white text-[14px]"
-                  style={{ fontFamily: "Mulish, sans-serif", fontWeight: 700 }}
-                >
-                  {card.title}
+                <p className="text-white text-[14px] font-['Mulish',sans-serif] font-bold">
+                  {title}
                 </p>
-                <p
-                  className="text-white/45 text-[13px] mt-1 leading-relaxed"
-                  style={{ fontFamily: "Mulish, sans-serif" }}
-                >
-                  {card.desc}
+                <p className="text-white/60 text-[13px] mt-1 leading-relaxed font-['Mulish',sans-serif]">
+                  {desc}
                 </p>
               </div>
             </div>
@@ -545,25 +537,24 @@ export function OrderForm() {
 
           {/* Contact direct */}
           <div
-            className="mt-2 p-5 rounded-2xl flex flex-col gap-3"
+            className="mt-2 p-5 rounded-xl flex flex-col gap-3"
             style={{ background: "rgba(211,0,82,0.1)", border: "1px solid rgba(211,0,82,0.2)" }}
           >
             <p
-              className="text-white/60 text-[12px] uppercase tracking-widest"
-              style={{ fontFamily: "Mulish, sans-serif", fontWeight: 700 }}
+              className="text-white/60 text-[12px] uppercase tracking-widest font-['Mulish',sans-serif] font-bold"
             >
               Contact direct
             </p>
             <a
               href="mailto:comenzi@cismind.ro"
-              className="flex items-center gap-2 text-white hover:text-[#f5a623] transition-colors"
-              style={{ fontFamily: "Mulish, sans-serif", fontWeight: 700 }}
+              className="flex items-center gap-2 text-white hover:text-[#ffa300] transition-colors font-['Mulish',sans-serif] font-bold"
             >
-              <Mail size={15} color="#d30052" />
+              <Mail size={15} color="#e70050" />
               comenzi@cismind.ro
             </a>
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

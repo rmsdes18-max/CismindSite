@@ -1,0 +1,20 @@
+import { useQuery } from '@tanstack/react-query'
+import { env } from '@/config/env'
+import { SheetsService } from '@/lib/google/sheets'
+import type { Order } from '@/types/order'
+
+export function useDeletedOrders(getToken: () => Promise<string>, isAuthenticated: boolean) {
+  return useQuery<Order[]>({
+    queryKey: ['orders-deleted'],
+    queryFn: async () => {
+      if (!env.useGoogle) return []
+      const svc = new SheetsService(env.sheetsId, env.sheetsTab, getToken)
+      return svc.listOrders(true)
+    },
+    refetchInterval: 30_000,
+    staleTime: 10_000,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+    enabled: !env.useGoogle || isAuthenticated,
+  })
+}
