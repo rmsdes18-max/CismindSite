@@ -11,6 +11,10 @@ interface Props {
   onAddNote: (id: string, text: string) => void
   onAddVersion: (id: string, note: string) => void
   onAddItem: (id: string, item: OrderItem) => void
+  onUpdateField?: (id: string, fields: Record<string, unknown>) => void
+  onUpdateItem?: (id: string, index: number, item: OrderItem) => void
+  onDeleteItem?: (id: string, index: number) => void
+  onDeleteNote?: (id: string, index: number) => void
   onDelete?: (id: string) => void
 }
 
@@ -22,6 +26,10 @@ export function AllList({
   onAddNote,
   onAddVersion,
   onAddItem,
+  onUpdateField,
+  onUpdateItem,
+  onDeleteItem,
+  onDeleteNote,
   onDelete,
 }: Props) {
   const [filter, setFilter] = useState<'all' | OrderStatus>('all')
@@ -39,7 +47,7 @@ export function AllList({
     return [...f].sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
   }, [orders, filter])
 
-  const cardProps = { onChangeStatus, onAddNote, onAddVersion, onAddItem, onDelete }
+  const cardProps = { onChangeStatus, onAddNote, onAddVersion, onAddItem, onUpdateField, onUpdateItem, onDeleteItem, onDeleteNote, onDelete }
 
   return (
     <div>

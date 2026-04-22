@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Order, OrderItem, OrderStatus } from '@/types/order'
+import type { Order, OrderItem, OrderStatus, OrderChannel } from '@/types/order'
 import { CHANNELS } from '@/lib/constants'
 import { dayDiff, fmtDateShort } from '@/lib/dates'
 import { formatPhone } from '@/lib/format'
@@ -7,6 +7,7 @@ import { StatusDot } from './StatusDot'
 import { StatusPills } from './StatusPills'
 import { ProductList } from './ProductList'
 import { AddProductForm } from './AddProductForm'
+import { EditableField } from './EditableField'
 // TODO: reactivare versiuni când business-ul cere iterații vizuale
 // import { VersionsBlock } from './VersionsBlock'
 import { NotesBlock } from './NotesBlock'
@@ -20,6 +21,10 @@ interface Props {
   onAddNote: (id: string, text: string) => void
   onAddVersion: (id: string, note: string) => void
   onAddItem: (id: string, item: OrderItem) => void
+  onUpdateField?: (id: string, fields: Partial<Pick<Order, 'name' | 'client' | 'contact' | 'channel' | 'deadline'>>) => void
+  onUpdateItem?: (id: string, index: number, item: OrderItem) => void
+  onDeleteItem?: (id: string, index: number) => void
+  onDeleteNote?: (id: string, index: number) => void
   onDelete?: (id: string) => void
   showDeadline?: boolean
 }
@@ -32,6 +37,10 @@ export function OrderCard({
   onAddNote,
   onAddVersion: _onAddVersion,
   onAddItem,
+  onUpdateField,
+  onUpdateItem,
+  onDeleteItem,
+  onDeleteNote,
   onDelete,
   showDeadline = true,
 }: Props) {
@@ -66,7 +75,15 @@ export function OrderCard({
           <span className="font-mono text-[11px] text-ink-faded mr-2 tracking-normal font-normal align-[2px]">
             #{order.id}
           </span>
-          {order.name}
+          {isOpen && onUpdateField ? (
+            <EditableField
+              value={order.name}
+              onSave={(v) => onUpdateField(order.id, { name: v })}
+              className="font-display text-[19px]"
+            />
+          ) : (
+            order.name
+          )}
         </h3>
         <div className="font-mono text-[13px] text-ink-soft leading-6">
           <div className="flex flex-wrap gap-x-3.5 gap-y-0.5">
@@ -90,18 +107,61 @@ export function OrderCard({
             <div className="col-span-full flex gap-6 justify-between">
               <div className="font-mono text-sm leading-relaxed">
                 <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
-                  Client · {CHANNELS[order.channel]}
+                  Client ·{' '}
+                  {onUpdateField ? (
+                    <select
+                      value={order.channel}
+                      onChange={(e) => onUpdateField(order.id, { channel: e.target.value as OrderChannel })}
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-transparent text-ink-faded text-[10px] tracking-[0.1em] uppercase cursor-pointer border-none outline-none"
+                    >
+                      {Object.entries(CHANNELS).map(([k, v]) => (
+                        <option key={k} value={k}>{v}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    CHANNELS[order.channel]
+                  )}
                 </span>
-                <span className="text-ink">{order.client}</span>
-                <div className="font-mono text-[11px] text-ink-faded mt-0.5">{formatPhone(order.contact)}</div>
+                {onUpdateField ? (
+                  <EditableField
+                    value={order.client}
+                    onSave={(v) => onUpdateField(order.id, { client: v })}
+                    className="text-ink"
+                  />
+                ) : (
+                  <span className="text-ink">{order.client}</span>
+                )}
+                <div className="font-mono text-[11px] text-ink-faded mt-0.5">
+                  {onUpdateField ? (
+                    <EditableField
+                      value={order.contact}
+                      onSave={(v) => onUpdateField(order.id, { contact: v })}
+                      className="text-ink-faded"
+                      placeholder="contact"
+                    />
+                  ) : (
+                    formatPhone(order.contact)
+                  )}
+                </div>
               </div>
               <div className="font-mono text-sm leading-relaxed text-right">
                 <span className="block text-ink-faded text-[10px] tracking-[0.1em] uppercase mb-1">
                   Deadline
                 </span>
-                <span className="text-ink font-semibold">
-                  {fmtDateShort(order.deadline)}
-                </span>
+                {onUpdateField ? (
+                  <EditableField
+                    value={order.deadline.split('T')[0]!}
+                    onSave={(v) => onUpdateField(order.id, { deadline: new Date(v + 'T17:00:00').toISOString() })}
+                    className="text-ink font-semibold"
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                ) : (
+                  <span className="text-ink font-semibold">
+                    {fmtDateShort(order.deadline)}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -115,7 +175,11 @@ export function OrderCard({
                   {order.items.length} {order.items.length === 1 ? 'produs' : 'produse'}
                 </span>
               </div>
-              <ProductList items={order.items} />
+              <ProductList
+                items={order.items}
+                onEditItem={onUpdateItem ? (idx, item) => onUpdateItem(order.id, idx, item) : undefined}
+                onDeleteItem={onDeleteItem ? (idx) => onDeleteItem(order.id, idx) : undefined}
+              />
               {!addingItem && (
                 <button
                   className="font-mono text-[11px] tracking-[0.06em] text-accent py-1.5 hover:underline"
@@ -140,6 +204,7 @@ export function OrderCard({
             <NotesBlock
               notes={order.notes}
               onAddNote={(text) => onAddNote(order.id, text)}
+              onDeleteNote={onDeleteNote ? (idx) => onDeleteNote(order.id, idx) : undefined}
             />
 
             <DriveFolders drive={order.drive} />

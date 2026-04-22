@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import type { OrderNote } from '@/types/order'
 import { fmtRelative } from '@/lib/dates'
+import { X } from 'lucide-react'
 
 interface Props {
   notes: OrderNote[]
   onAddNote: (text: string) => void
+  onDeleteNote?: (index: number) => void
 }
 
-export function NotesBlock({ notes, onAddNote }: Props) {
+export function NotesBlock({ notes, onAddNote, onDeleteNote }: Props) {
   const [text, setText] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,14 +31,25 @@ export function NotesBlock({ notes, onAddNote }: Props) {
       {notes.length > 0 && (
         <ul className="list-none m-0 mb-2.5 p-0">
           {notes.map((n, i) => (
-            <li key={i} className="py-2.5 border-b border-dashed border-rule last:border-b-0">
+            <li key={i} className="py-2.5 border-b border-dashed border-rule last:border-b-0 group">
               <div className="flex justify-between mb-1">
                 <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink">
                   {n.by}
                 </span>
-                <span className="font-mono text-[10px] text-ink-faded tracking-[0.03em]">
-                  {fmtRelative(n.at)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] text-ink-faded tracking-[0.03em]">
+                    {fmtRelative(n.at)}
+                  </span>
+                  {onDeleteNote && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDeleteNote(i) }}
+                      className="text-ink-faded hover:text-accent transition-colors opacity-0 group-hover:opacity-100"
+                      title="Șterge nota"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="font-display text-[13px] leading-[1.45] text-ink-soft">{n.text}</div>
             </li>

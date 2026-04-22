@@ -9,7 +9,7 @@ import { useOrders } from '@/hooks/useOrders'
 import { useDeletedOrders } from '@/hooks/useDeletedOrders'
 import { useCreateOrder } from '@/hooks/useCreateOrder'
 import type { NewOrderPayload } from '@/hooks/useCreateOrder'
-import { useChangeStatus, useAddNote, useAddVersion, useAddItem } from '@/hooks/useOrdersMutations'
+import { useChangeStatus, useAddNote, useAddVersion, useAddItem, useUpdateOrderField, useUpdateItem, useDeleteItem, useDeleteNote } from '@/hooks/useOrdersMutations'
 import { useDeleteOrder } from '@/hooks/useDeleteOrder'
 import { AuthGuard } from '@/components/auth/AuthGuard'
 import { UserBadge } from '@/components/auth/UserBadge'
@@ -48,6 +48,10 @@ function AppShell() {
   const addNote = useAddNote(mutDeps)
   const addVersion = useAddVersion(mutDeps)
   const addItem = useAddItem(mutDeps)
+  const updateField = useUpdateOrderField(mutDeps)
+  const updateItem = useUpdateItem(mutDeps)
+  const deleteItemMut = useDeleteItem(mutDeps)
+  const deleteNoteMut = useDeleteNote(mutDeps)
   const deleteOrder = useDeleteOrder(mutDeps)
 
   useEffect(() => {
@@ -213,11 +217,49 @@ function AppShell() {
     ? Math.max(0, Math.round((Date.now() - dataUpdatedAt) / 60_000))
     : null
 
+  const handleUpdateField = (id: string, fields: Partial<Pick<Order, 'name' | 'client' | 'contact' | 'channel' | 'deadline'>>) => {
+    updateField.mutate({ id, fields })
+    if (!env.useGoogle) {
+      setLocalOrders((os) => os.map((o) => (o.id === id ? { ...o, ...fields } : o)))
+    }
+  }
+
+  const handleUpdateItem = (id: string, index: number, item: OrderItem) => {
+    updateItem.mutate({ id, index, item })
+    if (!env.useGoogle) {
+      setLocalOrders((os) => os.map((o) =>
+        o.id === id ? { ...o, items: o.items.map((it, i) => (i === index ? item : it)) } : o,
+      ))
+    }
+  }
+
+  const handleDeleteItem = (id: string, index: number) => {
+    deleteItemMut.mutate({ id, index })
+    if (!env.useGoogle) {
+      setLocalOrders((os) => os.map((o) =>
+        o.id === id ? { ...o, items: o.items.filter((_, i) => i !== index) } : o,
+      ))
+    }
+  }
+
+  const handleDeleteNote = (id: string, index: number) => {
+    deleteNoteMut.mutate({ id, index })
+    if (!env.useGoogle) {
+      setLocalOrders((os) => os.map((o) =>
+        o.id === id ? { ...o, notes: o.notes.filter((_, i) => i !== index) } : o,
+      ))
+    }
+  }
+
   const cardProps = {
     onChangeStatus: handleChangeStatus,
     onAddNote: handleAddNote,
     onAddVersion: handleAddVersion,
     onAddItem: handleAddItem,
+    onUpdateField: handleUpdateField,
+    onUpdateItem: handleUpdateItem,
+    onDeleteItem: handleDeleteItem,
+    onDeleteNote: handleDeleteNote,
     onDelete: handleDelete,
     openId,
     setOpenId,
